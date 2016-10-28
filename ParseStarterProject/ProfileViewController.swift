@@ -166,6 +166,9 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     override func viewDidAppear(_ animated: Bool) {
         refresh()
+        self.hasSkillsTable.tableFooterView = UIView()
+        self.wantsSkillsTable.tableFooterView = UIView()
+        
     }
 
 
@@ -190,6 +193,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
             let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
             cell.textLabel?.text = hasSkillsArray[indexPath.row]
             cell.textLabel?.font = UIFont(name: "MarkerFelt-Thin", size: 15)
+            turnSpinnerOff()
             return cell
             
         } else {
