@@ -16,8 +16,7 @@ var skillDescriptionTitle = ""
  To Do:
  
  Put in activity indicator
- Gender switch and save
- drop down list for neighbourhood and save
+ add another table View Controller, with a checklist of neighbourhoods
  
  */
 
@@ -28,13 +27,18 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
     var wantsSkillsArray = [String]()
     
     @IBOutlet var usernameLabel: UILabel!
+    @IBOutlet var descriptionText: UITextView!
     @IBOutlet var profileImage: UIImageView!
     @IBOutlet var genderSwitch: UISwitch!
 
     @IBOutlet var hasSkillsTable: UITableView!
     @IBOutlet var wantsSkillsTable: UITableView!
-
     
+    @IBAction func neighbourhoods(_ sender: AnyObject) {
+        
+    }
+    
+
     @IBAction func updateImage(_ sender: AnyObject) {
         
         let imagePicker = UIImagePickerController()
@@ -58,19 +62,30 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     @IBAction func savePage(_ sender: AnyObject) {
         
+        turnSpinnerOn()
+        
         //save image
         let imageData = UIImagePNGRepresentation(profileImage.image!)
         PFUser.current()?["photo"] = PFFile(name: "profile.png", data: imageData!)
+        
+        let isFemale = genderSwitch.isOn
+        PFUser.current()?["isFemale"] = isFemale
+        
+        let text = descriptionText.text
+        PFUser.current()?["description"] = text
+        
         PFUser.current()?.saveInBackground(block: { (success, error) in
             if error != nil {
                 print(error)
             } else {
-                print("image saved")
+                print("image, gender, and description saved")
             }
         })
+
+        // save area
+        // drop down?
         
-        // save gender
-        
+        turnSpinnerOff()
         
         
     }
@@ -156,11 +171,22 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
                         self.profileImage.image = downloadedImage
                     }
                 }
-                
             })
-
         }
         
+        // get description and gender
+        
+        if let text = PFUser.current()?["description"] as? String {
+            self.descriptionText.text = text
+        }
+        if let isFemale = PFUser.current()?["isFemale"] as? Int {
+            if isFemale == 1 {
+                self.genderSwitch.setOn(true, animated: false)
+            } else {
+                self.genderSwitch.setOn(false, animated: false)
+            }
+        }
+        // get area
         
     }
     
@@ -170,9 +196,6 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         self.wantsSkillsTable.tableFooterView = UIView()
         
     }
-
-
-    
 
     internal func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // Return the number of items in the sample data structure.

@@ -139,6 +139,7 @@ class SkillsTableViewController: UITableViewController {
             //  unclicking a skill
             hasSkill[skillsArray[indexPath.row]] = false
             cell?.accessoryType = UITableViewCellAccessoryType.none
+            
             let query = PFQuery(className: "Skills")
             query.whereKey("name", equalTo: skillsArray[indexPath.row])
             
