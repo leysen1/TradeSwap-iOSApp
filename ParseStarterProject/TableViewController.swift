@@ -11,6 +11,10 @@ import Parse
 
 class TableViewController: UITableViewController, UINavigationControllerDelegate {
     
+    // shows users with similar interests in your area
+    
+    var students = [String]()
+    var teachers = [String]()
 
     @IBAction func logout(_ sender: AnyObject) {
         PFUser.logOut()
@@ -18,13 +22,37 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // get students
+        let query = PFQuery(className: "Skills")
+        query.whereKey("hasSkill", contains: (PFUser.current()?.username!))
+        query.findObjectsInBackground { (objects, error) in
+            if error != nil {
+                print(error)
+            } else {
+                if let objects = objects {
+                    for object in objects {
+                        if let studentCol = object["wantsSkill"] as? NSArray {
+                            for student in studentCol {
+                                if self.students.contains(student as! String) == false {
+                                    self.students.append(student as! String)
+                                } else {
+                                    //do nothing
+                                }
+                            }
+                        }
+                    }
+                     self.tableView.reloadData()
+                }
+                print("students \(self.students)")
+            }
+        }
+       
+        
+        
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -40,14 +68,59 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 4
+        return students.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! MainTableViewCell
 
-        // Configure the cell...
+        cell.userLabel.text = students[indexPath.row]
+        
+        let query = PFQuery(className: "Skills")
+        query.whereKey("wantsSkill", contains: students[indexPath.row])
+        query.findObjectsInBackground { (objects, error) in
+            if error != nil {
+                print(error)
+            } else {
+                var interests = [String]()
+                if let objects = objects {
+                    for object in objects {
+                        interests.append(object["name"] as! String)
+                    }
+                    var interestsString = String()
+                    for item in interests {
+                        interestsString.append(item)
+                        interestsString.append(", ")
+                    }
+             
+                    cell.interestedInLabel.text = "Interested in: \(interestsString)"
+                }
+            }
+        }
+        
+        let query2 = PFQuery(className: "Skills")
+        query2.whereKey("hasSkill", contains: students[indexPath.row])
+        query2.findObjectsInBackground { (objects, error) in
+            if error != nil {
+                print(error)
+            } else {
+                var abilities = [String]()
+                if let objects = objects {
+                    for object in objects {
+                        abilities.append(object["name"] as! String)
+                    }
+                    var abilitiesString = String()
+                    for item in abilities {
+                        abilitiesString.append(item)
+                        abilitiesString.append(", ")
+                    }
+              
+                    cell.abilitiesLabel.text = "Abilities: \(abilitiesString)"
+                }
+            }
+        }
+        
 
         return cell
     }
