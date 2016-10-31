@@ -413,7 +413,11 @@
                         </barButtonItem>
                     </toolbarItems>
                     <connections>
+                        <outlet property="addImageButton" destination="bkU-V2-43r" id="YS5-hH-kKg"/>
                         <outlet property="descriptionText" destination="OXE-Fc-IqI" id="gjU-TI-npc"/>
+                        <outlet property="greyLabel1" destination="a4p-mi-Vqu" id="WTB-Xm-h6H"/>
+                        <outlet property="greyLabel2" destination="2Oi-cr-s6t" id="Agx-de-fMa"/>
+                        <outlet property="saveButton" destination="RN8-64-wEI" id="Ji2-fc-3Su"/>
                         <outlet property="skillLabel" destination="SrU-eC-qxV" id="vHB-VC-yY0"/>
                         <outlet property="tableView" destination="mzY-yZ-MW4" id="2hk-2s-gTS"/>
                     </connections>

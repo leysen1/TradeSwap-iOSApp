@@ -10,6 +10,9 @@
 import UIKit
 import Parse
 
+// When saving new image, may need to add a unique name of image, in order to find it when deleting
+// In the load for wantSkillTable, change grey labels
+
 class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     var imageFiles = [PFFile]()
@@ -19,11 +22,18 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
     var editMode = false
     var userSelectedSD = String()
     var skillDescriptionTitleSD = ""
-    
+    var hasSkillTableSD: Bool = true
   
     
     @IBOutlet var skillLabel: UILabel!
     @IBOutlet var descriptionText: UITextView!
+    @IBOutlet var saveButton: UIButton!
+    @IBOutlet var addImageButton: UIBarButtonItem!
+    
+    
+    @IBOutlet var greyLabel1: UILabel!
+    @IBOutlet var greyLabel2: UILabel!
+    
     @IBOutlet var tableView: UITableView!
     
     
@@ -52,6 +62,12 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         let query = PFQuery(className: "SkillDescription")
         query.whereKey("skill", equalTo: skillDescriptionTitleSD)
         query.whereKey("username", equalTo: (PFUser.current()?.username!)!)
+        if hasSkillTableSD == true {
+            query.whereKey("hasSkill", equalTo: 1)
+        } else {
+            // wantsSkillTable
+            query.whereKey("hasSkill", equalTo: 0)
+        }
         query.findObjectsInBackground { (objects, error) in
             if error != nil {
                 print(error)
@@ -75,6 +91,12 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
                     descriptionObject["skill"] = self.skillDescriptionTitleSD
                     descriptionObject["description"] = self.descriptionText.text
                     descriptionObject["username"] = PFUser.current()?.username
+                    if self.hasSkillTableSD == true {
+                        descriptionObject["hasSkill"] = 1
+                    } else {
+                        // wantsSkillTable
+                        descriptionObject["hasSkill"] = 0
+                    }
 
                     descriptionObject.saveInBackground { (success, error) in
                         if error != nil {
@@ -125,7 +147,13 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         skillDescriptions["skill"] = self.skillDescriptionTitleSD
         skillDescriptions["description"] = self.descriptionText.text
         skillDescriptions["username"] = PFUser.current()?.username
-        
+        if self.hasSkillTableSD == true {
+            skillDescriptions["hasSkill"] = 1
+        } else {
+            // wantsSkillTable
+            skillDescriptions["hasSkill"] = 0
+        }
+
         let imageData = UIImageJPEGRepresentation(self.newImage, 0.8)
         skillDescriptions["skillFile"] = PFFile(name: "image.png", data: imageData!)
         
@@ -159,15 +187,24 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         activityIndicator.startAnimating()
         UIApplication.shared.beginIgnoringInteractionEvents()
         
-        
         imageFiles.removeAll()
         descriptionLabel.removeAll()
         
-        
         // creating the image array from the saved PFFiles
         let query = PFQuery(className: "SkillDescription")
-        query.whereKey("username", equalTo: (PFUser.current()?.username!)!)
+        if editMode == false {
+            query.whereKey("username", equalTo: userSelectedSD)
+        } else {
+            query.whereKey("username", equalTo: (PFUser.current()?.username!)!)
+        }
         query.whereKey("skill", equalTo: self.skillDescriptionTitleSD)
+        
+        if hasSkillTableSD == true {
+            query.whereKey("hasSkill", equalTo: 1)
+        } else {
+            query.whereKey("hasSkill", equalTo: 0)
+        }
+ 
         query.findObjectsInBackground { (objects, error) in
             if error != nil {
                 print(error)
@@ -203,23 +240,32 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        print("editmode \(editMode)")
-        print("skilldes \(self.skillDescriptionTitleSD)")
-        
+
         if editMode == false {
             // viewing another user's skill description
-            // skill title = User's Skill
-            // grey labels
+            
             // hide and deactivate save and plus button
             skillLabel.text = "\(self.userSelectedSD)'s \(self.skillDescriptionTitleSD)"
-            
+            greyLabel1.text = "Description"
+            greyLabel2.text = "Skill Demonstrated"
+            saveButton.isEnabled = false
+            saveButton.alpha = 0
+            addImageButton.isEnabled = false
+            // hide imagebutton
         } else {
-        
-            refresh()
-            
+            // editMode is true
             skillLabel.text = self.skillDescriptionTitleSD
+            greyLabel1.text = "Describe your expertise"
+            greyLabel2.text = "Show us your skill"
+            if self.hasSkillTableSD == true {
+                self.title = "Skills I have"
+            } else {
+                // wants Skills view
+                self.title = "Skills I want"
+            }
         }
+        print("hasSkillTableSD \(hasSkillTableSD)")
+        refresh()
     }
     
     override func viewDidAppear(_ animated: Bool) {

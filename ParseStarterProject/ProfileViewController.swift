@@ -25,6 +25,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
     var hasSkillsArray = [String]()
     var wantsSkillsArray = [String]()
     var skillDescriptionTitlePV = ""
+    var hasSkillTablePV: Bool = true
     
     @IBOutlet var usernameLabel: UILabel!
     @IBOutlet var descriptionText: UITextView!
@@ -237,13 +238,14 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         if tableView == hasSkillsTable {
             self.skillDescriptionTitlePV = hasSkillsArray[indexPath.row]
-        
-            print("located here")
-            print(self.skillDescriptionTitlePV)
+            hasSkillTablePV = true
             performSegue(withIdentifier: "toSkillDesSegue", sender: nil)
+            
         } else {
             // wantsSkillsTable
-            
+            self.skillDescriptionTitlePV = wantsSkillsArray[indexPath.row]
+            hasSkillTablePV = false
+            performSegue(withIdentifier: "toSkillDesSegue", sender: nil)
         }
         
         
@@ -254,6 +256,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
             let skillDesVC = segue.destination as! SkillDescriptionViewController
             skillDesVC.editMode = true
             skillDesVC.skillDescriptionTitleSD = skillDescriptionTitlePV
+            skillDesVC.hasSkillTableSD = hasSkillTablePV
         }
         
         if (segue.identifier == "toSkillsSegue") {
