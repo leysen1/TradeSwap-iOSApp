@@ -12,6 +12,7 @@ import Parse
 var showMySkills = false
 var skillDescriptionTitle = ""
 
+
 /*
  To Do:
  
@@ -20,11 +21,13 @@ var skillDescriptionTitle = ""
  
  */
 
+
 class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     var activityIndicator = UIActivityIndicatorView()
     var hasSkillsArray = [String]()
     var wantsSkillsArray = [String]()
+    
     
     @IBOutlet var usernameLabel: UILabel!
     @IBOutlet var descriptionText: UITextView!
@@ -230,17 +233,28 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
         
     }
+
   
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: "toSkillDesSegue", sender: nil)
         
+        performSegue(withIdentifier: "toSkillDesSegue", sender: nil)
+
         if tableView == hasSkillsTable {
-        skillDescriptionTitle = hasSkillsArray[indexPath.row]
+            skillDescriptionTitle = hasSkillsArray[indexPath.row]
+        
         print("located here")
         print(skillDescriptionTitle)
         }
         
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let skillDesVC = segue.destination as! SkillDescriptionViewController
+        skillDesVC.editMode = true
+  
+  
+    }
+    
     
     func turnSpinnerOn() {
         

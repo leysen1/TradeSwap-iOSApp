@@ -16,6 +16,10 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
     var descriptionLabel = [String]()
     var newImage = UIImage()
     var activityIndicator = UIActivityIndicatorView()
+    var editMode = false
+    var userSelected = String()
+    
+  
     
     @IBOutlet var skillLabel: UILabel!
     @IBOutlet var descriptionText: UITextView!
@@ -31,6 +35,8 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         self.present(alert, animated: true, completion: nil)
 
     }
+    
+
 
     @IBAction func saveDescription(_ sender: AnyObject) {
         // spinner
@@ -168,17 +174,17 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
                 // create image array
                 if let rows = objects {
                     for row in rows {
-                        if let object = row as? PFObject {
-                            if object["skillFile"] != nil {
-                                self.imageFiles.append(object["skillFile"] as! PFFile)
-                                self.descriptionLabel.append(object["description"] as! String)
-                            } else {
-                                // no images or desc saved
+                      // if let object = row as? PFObject {
+                            if row["skillFile"] != nil {
+                                self.imageFiles.append(row["skillFile"] as! PFFile)
                             }
+                            if row["description"] != nil {
+                                self.descriptionLabel.append(row["description"] as! String)
                         }
+                      
+                      //  }
                     }
                     self.tableView.reloadData()
-                    print("please find here \(self.descriptionLabel)")
                     
                     if self.descriptionLabel != [] {
                         self.descriptionText.text = self.descriptionLabel[0]
@@ -196,6 +202,18 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print("editmode \(editMode)")
+        print("skilldes \(skillDescriptionTitle)")
+        
+        if editMode == false {
+            // viewing another user's skill description
+            // skill title = User's Skill
+            // grey labels
+            // hide and deactivate save and plus button
+            skillLabel.text = "\(self.userSelected)'s "
+            
+        }
         
         refresh()
     }

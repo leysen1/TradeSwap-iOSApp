@@ -612,6 +612,7 @@
                         <outlet property="userSkillsLabel" destination="1NA-8L-ue5" id="kB7-Nd-QrF"/>
                         <outlet property="userWantsLabel" destination="g8I-DW-acn" id="KL3-k1-XaE"/>
                         <outlet property="wantsTable" destination="toS-1N-TwW" id="VCy-nC-fnY"/>
+                        <segue destination="JpF-HH-AQS" kind="show" identifier="SkillDesSegue" id="fc9-VC-ett"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gDT-Nk-AuN" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -642,4 +643,7 @@
     <resources>
         <image name="profile.png" width="512" height="512"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="fc9-VC-ett"/>
+    </inferredMetricsTieBreakers>
 </document>
