@@ -9,7 +9,7 @@
 import UIKit
 import Parse
 
-var userSelected = String()
+
 
 class TableViewController: UITableViewController, UINavigationControllerDelegate {
     
@@ -17,6 +17,7 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
     
     var students = [String]()
     var teachers = [String]()
+    var userSelectedTV = String()
 
     @IBAction func logout(_ sender: AnyObject) {
         PFUser.logOut()
@@ -131,10 +132,17 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        userSelected = students[indexPath.row]
-        performSegue(withIdentifier: "toPotentialMatchSegue", sender: nil)
+        userSelectedTV = students[indexPath.row]
+        performSegue(withIdentifier: "toPotentialMatchSegue", sender: self)
         
         
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "toPotentialMatchSegue") {
+            let PotentialVC = segue.destination as! PotentialMatchViewController
+            PotentialVC.userSelectedPM = userSelectedTV
+        }
     }
 
     /*

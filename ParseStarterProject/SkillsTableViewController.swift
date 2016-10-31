@@ -22,6 +22,7 @@ class SkillsTableViewController: UITableViewController {
     var skillsArray = [String]()
     var hasSkill = [String: Bool]()
     var wantsSkill = [String: Bool]()
+    var showMySkills: Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,7 +51,7 @@ class SkillsTableViewController: UITableViewController {
                             }
                             self.tableView.reloadData()
                         
-                       if showMySkills == true {
+                       if self.showMySkills == true {
                         // identify which skills you have
                         let query2 = PFQuery(className: "Skills")
                         query2.whereKey("hasSkill", contains: (PFUser.current()?.username!)!)

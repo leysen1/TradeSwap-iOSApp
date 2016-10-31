@@ -14,6 +14,8 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
     
     var skills = [String]()
     var interests = [String]()
+    var userSelectedPM = String()
+    var skillDescriptionTitlePM = ""
     @IBOutlet var userProfileLabel: UILabel!
     @IBAction func matchButton(_ sender: AnyObject) {
     }
@@ -26,12 +28,12 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        userProfileLabel.text = "\(userSelected)'s Profile"
-        userSkillsLabel.text = "\(userSelected)'s Skills"
-        userWantsLabel.text = "\(userSelected) would like to learn:"
+        userProfileLabel.text = "\(userSelectedPM)'s Profile"
+        userSkillsLabel.text = "\(userSelectedPM)'s Skills"
+        userWantsLabel.text = "\(userSelectedPM) would like to learn:"
         
         let querySkills = PFQuery(className: "Skills")
-        querySkills.whereKey("hasSkill", contains: userSelected)
+        querySkills.whereKey("hasSkill", contains: userSelectedPM)
         querySkills.findObjectsInBackground { (objects, error) in
             if error != nil {
                 print(error)
@@ -47,7 +49,7 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
         }
         
         let queryInterests = PFQuery(className: "Skills")
-        queryInterests.whereKey("wantsSkill", contains: userSelected)
+        queryInterests.whereKey("wantsSkill", contains: userSelectedPM)
         queryInterests.findObjectsInBackground { (objects, error) in
             if error != nil {
                 print(error)
@@ -101,17 +103,23 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if tableView == skillsTable {
-            performSegue(withIdentifier: "SkillDesSegue", sender: self)
-            skillDescriptionTitle = skills[indexPath.row]
             
+            skillDescriptionTitlePM = skills[indexPath.row]
+            performSegue(withIdentifier: "SkillDesSegue", sender: self)
             
         }
         
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let profileVC = segue.destination as! SkillDescriptionViewController
-        profileVC.editMode = false
+        
+        if (segue.identifier == "SkillDesSegue") {
+            let skillDesVC = segue.destination as! SkillDescriptionViewController
+            skillDesVC.editMode = false
+            skillDesVC.skillDescriptionTitleSD = skillDescriptionTitlePM
+            skillDesVC.userSelectedSD = userSelectedPM
+            
+        }
     }
 
     /*

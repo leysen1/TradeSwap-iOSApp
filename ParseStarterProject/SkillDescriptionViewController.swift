@@ -17,7 +17,8 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
     var newImage = UIImage()
     var activityIndicator = UIActivityIndicatorView()
     var editMode = false
-    var userSelected = String()
+    var userSelectedSD = String()
+    var skillDescriptionTitleSD = ""
     
   
     
@@ -49,7 +50,7 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         UIApplication.shared.beginIgnoringInteractionEvents()
         
         let query = PFQuery(className: "SkillDescription")
-        query.whereKey("skill", equalTo: skillDescriptionTitle)
+        query.whereKey("skill", equalTo: skillDescriptionTitleSD)
         query.whereKey("username", equalTo: (PFUser.current()?.username!)!)
         query.findObjectsInBackground { (objects, error) in
             if error != nil {
@@ -71,7 +72,7 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
                     // there are no objects yet 
                     print("no objects")
                     let descriptionObject = PFObject(className: "SkillDescription")
-                    descriptionObject["skill"] = skillDescriptionTitle
+                    descriptionObject["skill"] = self.skillDescriptionTitleSD
                     descriptionObject["description"] = self.descriptionText.text
                     descriptionObject["username"] = PFUser.current()?.username
 
@@ -121,7 +122,7 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
             
         // save picture
         let skillDescriptions = PFObject(className: "SkillDescription")
-        skillDescriptions["skill"] = skillDescriptionTitle
+        skillDescriptions["skill"] = self.skillDescriptionTitleSD
         skillDescriptions["description"] = self.descriptionText.text
         skillDescriptions["username"] = PFUser.current()?.username
         
@@ -166,7 +167,7 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         // creating the image array from the saved PFFiles
         let query = PFQuery(className: "SkillDescription")
         query.whereKey("username", equalTo: (PFUser.current()?.username!)!)
-        query.whereKey("skill", equalTo: skillDescriptionTitle)
+        query.whereKey("skill", equalTo: self.skillDescriptionTitleSD)
         query.findObjectsInBackground { (objects, error) in
             if error != nil {
                 print(error)
@@ -204,22 +205,25 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         super.viewDidLoad()
         
         print("editmode \(editMode)")
-        print("skilldes \(skillDescriptionTitle)")
+        print("skilldes \(self.skillDescriptionTitleSD)")
         
         if editMode == false {
             // viewing another user's skill description
             // skill title = User's Skill
             // grey labels
             // hide and deactivate save and plus button
-            skillLabel.text = "\(self.userSelected)'s "
+            skillLabel.text = "\(self.userSelectedSD)'s \(self.skillDescriptionTitleSD)"
             
-        }
+        } else {
         
-        refresh()
+            refresh()
+            
+            skillLabel.text = self.skillDescriptionTitleSD
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        skillLabel.text = skillDescriptionTitle
+        
 
         self.tableView.reloadData()
     }

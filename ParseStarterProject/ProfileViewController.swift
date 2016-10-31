@@ -9,10 +9,6 @@
 import UIKit
 import Parse
 
-var showMySkills = false
-var skillDescriptionTitle = ""
-
-
 /*
  To Do:
  
@@ -25,9 +21,10 @@ var skillDescriptionTitle = ""
 class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     var activityIndicator = UIActivityIndicatorView()
+    var showMySkillsPV = false
     var hasSkillsArray = [String]()
     var wantsSkillsArray = [String]()
-    
+    var skillDescriptionTitlePV = ""
     
     @IBOutlet var usernameLabel: UILabel!
     @IBOutlet var descriptionText: UITextView!
@@ -94,7 +91,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
 
     @IBAction func skills(_ sender: AnyObject) {
-        showMySkills = true
+        showMySkillsPV = true
         OperationQueue.main.addOperation {
             [weak self] in
             self?.performSegue(withIdentifier: "toSkillsSegue", sender: self)
@@ -102,13 +99,14 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
 
     }
     @IBAction func skillsIWant(_ sender: AnyObject) {
-        showMySkills = false
+        showMySkillsPV = false
         OperationQueue.main.addOperation {
             [weak self] in
             self?.performSegue(withIdentifier: "toSkillsSegue", sender: self)
         }
     }
     
+   
 
     func refresh() {
         
@@ -237,22 +235,31 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
   
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        performSegue(withIdentifier: "toSkillDesSegue", sender: nil)
-
         if tableView == hasSkillsTable {
-            skillDescriptionTitle = hasSkillsArray[indexPath.row]
+            self.skillDescriptionTitlePV = hasSkillsArray[indexPath.row]
         
-        print("located here")
-        print(skillDescriptionTitle)
+            print("located here")
+            print(self.skillDescriptionTitlePV)
+            performSegue(withIdentifier: "toSkillDesSegue", sender: nil)
+        } else {
+            // wantsSkillsTable
+            
         }
+        
         
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let skillDesVC = segue.destination as! SkillDescriptionViewController
-        skillDesVC.editMode = true
-  
-  
+        if (segue.identifier == "toSkillDesSegue") {
+            let skillDesVC = segue.destination as! SkillDescriptionViewController
+            skillDesVC.editMode = true
+            skillDesVC.skillDescriptionTitleSD = skillDescriptionTitlePV
+        }
+        
+        if (segue.identifier == "toSkillsSegue") {
+            let skillVC = segue.destination as! SkillsTableViewController
+            skillVC.showMySkills = showMySkillsPV
+        }
     }
     
     
