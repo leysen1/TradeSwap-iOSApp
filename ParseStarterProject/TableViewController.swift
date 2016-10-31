@@ -9,6 +9,8 @@
 import UIKit
 import Parse
 
+var userSelected = String()
+
 class TableViewController: UITableViewController, UINavigationControllerDelegate {
     
     // shows users with similar interests in your area
@@ -77,6 +79,7 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
 
         cell.userLabel.text = students[indexPath.row]
         
+        // get interested in
         let query = PFQuery(className: "Skills")
         query.whereKey("wantsSkill", contains: students[indexPath.row])
         query.findObjectsInBackground { (objects, error) in
@@ -99,6 +102,7 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
             }
         }
         
+        // get abilities
         let query2 = PFQuery(className: "Skills")
         query2.whereKey("hasSkill", contains: students[indexPath.row])
         query2.findObjectsInBackground { (objects, error) in
@@ -125,6 +129,13 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
         return cell
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        userSelected = students[indexPath.row]
+        performSegue(withIdentifier: "toPotentialMatchSegue", sender: nil)
+        
+        
+    }
 
     /*
     // Override to support conditional editing of the table view.
