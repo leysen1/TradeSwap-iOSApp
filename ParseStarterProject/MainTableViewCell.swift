@@ -12,7 +12,7 @@ class MainTableViewCell: UITableViewCell {
 
     @IBOutlet var userLabel: UILabel!
     @IBOutlet var interestedInLabel: UILabel!
-    @IBOutlet var abilitiesLabel: UILabel!
+    @IBOutlet var imageProfile: UIImageView!
     
     override func awakeFromNib() {
         super.awakeFromNib()

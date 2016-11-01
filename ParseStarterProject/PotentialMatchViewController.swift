@@ -16,6 +16,7 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
     var interests = [String]()
     var userSelectedPM = String()
     var skillDescriptionTitlePM = ""
+    var hasSkillTablePM = true
     @IBOutlet var userProfileLabel: UILabel!
     @IBAction func matchButton(_ sender: AnyObject) {
     }
@@ -24,11 +25,17 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
     @IBOutlet var userWantsLabel: UILabel!
     @IBOutlet var skillsTable: UITableView!
     @IBOutlet var wantsTable: UITableView!
+    @IBOutlet var profileDescription: UILabel!
+    @IBOutlet var profileImage: UIImageView!
+    @IBOutlet var backgroundImage: UIImageView!
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print("user selected \(userSelectedPM)")
 
-        userProfileLabel.text = "\(userSelectedPM)'s Profile"
+        userProfileLabel.text = userSelectedPM
         userSkillsLabel.text = "\(userSelectedPM)'s Skills"
         userWantsLabel.text = "\(userSelectedPM) would like to learn:"
         
@@ -64,6 +71,44 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
             }
         }
         
+        
+        // profile image and description
+        let query = PFQuery(className: "_User")
+        query.whereKey("username", equalTo: userSelectedPM)
+        query.findObjectsInBackground { (objects, error) in
+            if error != nil {
+                print(error)
+            } else {
+                if let objects = objects {
+                    for object in objects {
+                        if object["photo"] != nil {
+                            print("photo found")
+                            let profileData = object["photo"] as! PFFile
+                            print("profile Data \(profileData)")
+                            profileData.getDataInBackground { (data, error) in
+                                if let imageData = data {
+                                    if let downloadedImage = UIImage(data: imageData) {
+                                        //var imageView = UIImageView(frame: CGRect(x: 10, y: 10, width: self.profileImage.frame.size.width - 20, height: self.profileImage.frame.size.height - 20))
+                                        //imageView.image = downloadedImage
+                                        self.profileImage.image = downloadedImage
+                                        self.backgroundImage.image = downloadedImage
+                                    }
+                                }
+                            }
+                        }
+                        if let text = object["description"] as? String {
+                            print("text \(text)")
+                            self.profileDescription.text = text
+                        }
+                    }
+                } else {
+                    print("no objects")
+                }
+            }
+        }
+        
+        skillsTable.tableFooterView = UIView()
+        wantsTable.tableFooterView = UIView()
     }
 
     
@@ -103,11 +148,16 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if tableView == skillsTable {
-            
             skillDescriptionTitlePM = skills[indexPath.row]
-            performSegue(withIdentifier: "SkillDesSegue", sender: self)
+            hasSkillTablePM = true
             
+        } else {
+            // wants table
+            skillDescriptionTitlePM = interests[indexPath.row]
+            hasSkillTablePM = false
+
         }
+        performSegue(withIdentifier: "SkillDesSegue", sender: self)
         
     }
 
@@ -118,6 +168,7 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
             skillDesVC.editMode = false
             skillDesVC.skillDescriptionTitleSD = skillDescriptionTitlePM
             skillDesVC.userSelectedSD = userSelectedPM
+            skillDesVC.hasSkillTableSD = hasSkillTablePM
             
         }
     }

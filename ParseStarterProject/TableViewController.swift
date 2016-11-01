@@ -13,6 +13,7 @@ import Parse
 
 class TableViewController: UITableViewController, UINavigationControllerDelegate {
     
+    // filter for people looking for your skill
     // shows users with similar interests in your area
     
     var students = [String]()
@@ -26,6 +27,7 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.title = "Potential Matches"
         // get students
         let query = PFQuery(className: "Skills")
         query.whereKey("hasSkill", contains: (PFUser.current()?.username!))
@@ -51,7 +53,7 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
             }
         }
        
-        
+        tableView.tableFooterView = UIView()
         
 
     }
@@ -97,12 +99,41 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
                         interestsString.append(item)
                         interestsString.append(", ")
                     }
-             
+                    interestsString = String(interestsString.characters.dropLast(2))
                     cell.interestedInLabel.text = "Interested in: \(interestsString)"
                 }
             }
         }
         
+        // get photo
+        let queryPhoto = PFQuery(className: "_User")
+        queryPhoto.whereKey("username", equalTo: students[indexPath.row])
+        queryPhoto.findObjectsInBackground { (objects, error) in
+            if error != nil {
+                print(error)
+            } else {
+                if let objects = objects {
+                    for object in objects {
+                        if object["photo"] != nil {
+                            print("photo found")
+                            let profileData = object["photo"] as! PFFile
+                            print("profile Data \(profileData)")
+                            profileData.getDataInBackground { (data, error) in
+                                if let imageData = data {
+                                    if let downloadedImage = UIImage(data: imageData) {
+                                        cell.imageProfile.image = downloadedImage
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    print("no objects")
+                }
+            }
+        }
+        
+        /*
         // get abilities
         let query2 = PFQuery(className: "Skills")
         query2.whereKey("hasSkill", contains: students[indexPath.row])
@@ -125,7 +156,7 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
                 }
             }
         }
-        
+        */
 
         return cell
     }

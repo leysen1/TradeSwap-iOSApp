@@ -12,12 +12,14 @@ import Parse
 
 // When saving new image, may need to add a unique name of image, in order to find it when deleting
 // In the load for wantSkillTable, change grey labels
+// Add pop up full screen image view
 
 class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     var imageFiles = [PFFile]()
     var descriptionLabel = [String]()
     var newImage = UIImage()
+    var screenImage = UIImage()
     var activityIndicator = UIActivityIndicatorView()
     var editMode = false
     var userSelectedSD = String()
@@ -47,7 +49,6 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
 
     }
     
-
 
     @IBAction func saveDescription(_ sender: AnyObject) {
         // spinner
@@ -240,50 +241,67 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print("hasskill \(hasSkillTableSD)")
 
         if editMode == false {
             // viewing another user's skill description
-            
-            // hide and deactivate save and plus button
+            if self.hasSkillTableSD == true {
+                // a skill the user has
+                self.title = "Skill to Teach"
+                greyLabel2.text = "Skill Demonstrated"
+                
+                // hide imagebutton
+            } else {
+                // a skill the user wants
+                self.title = "Skill to Learn"
+                greyLabel2.text = "What \(self.userSelectedSD) already knows"
+            }
+            descriptionText.isUserInteractionEnabled = false
             skillLabel.text = "\(self.userSelectedSD)'s \(self.skillDescriptionTitleSD)"
             greyLabel1.text = "Description"
-            greyLabel2.text = "Skill Demonstrated"
             saveButton.isEnabled = false
             saveButton.alpha = 0
             addImageButton.isEnabled = false
-            // hide imagebutton
+            
         } else {
-            // editMode is true
+            // editMode is true - viewing your profile
+            
             skillLabel.text = self.skillDescriptionTitleSD
-            greyLabel1.text = "Describe your expertise"
-            greyLabel2.text = "Show us your skill"
+            descriptionText.isUserInteractionEnabled = true
             if self.hasSkillTableSD == true {
-                self.title = "Skills I have"
+            
+                self.title = "Skill to Teach"
+                greyLabel1.text = "Describe your expertise"
+                descriptionText.text = "Description"
+                greyLabel2.text = "Show us your skill"
+
             } else {
                 // wants Skills view
-                self.title = "Skills I want"
+                self.title = "Skill to Learn"
+                greyLabel1.text = "Description"
+                descriptionText.text = "Tell us what you're looking for and what you already know."
+                greyLabel2.text = "Show us what you already know"
             }
         }
         print("hasSkillTableSD \(hasSkillTableSD)")
         refresh()
     }
     
+    
     override func viewDidAppear(_ animated: Bool) {
-        
-
         self.tableView.reloadData()
     }
 
 
     func numberOfSections(in tableView: UITableView) -> Int {
- 
         return 1
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return imageFiles.count
-        
     }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SkillDescriptionTableViewCell
@@ -297,8 +315,22 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
             }
         }
         return cell
-        
     }
     
+   /*
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SkillDescriptionTableViewCell
+
+
+        if let fullImage: UIImage = cell.tableImage.image {
+            let fullImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
+            fullImageView.image = fullImage
+            self.view.addSubview(fullImageView)
+            fullScreen = true
+        }
+        
+        
+    }
+*/
 
 }
