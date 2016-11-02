@@ -18,8 +18,8 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
     var skillDescriptionTitlePM = ""
     var hasSkillTablePM = true
     @IBOutlet var userProfileLabel: UILabel!
-    @IBAction func matchButton(_ sender: AnyObject) {
-    }
+    @IBOutlet var matchButtonLabel: UIButton!
+
     
     @IBOutlet var userSkillsLabel: UILabel!
     @IBOutlet var userWantsLabel: UILabel!
@@ -91,6 +91,8 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
                                         //var imageView = UIImageView(frame: CGRect(x: 10, y: 10, width: self.profileImage.frame.size.width - 20, height: self.profileImage.frame.size.height - 20))
                                         //imageView.image = downloadedImage
                                         self.profileImage.image = downloadedImage
+                                        self.profileImage.layer.cornerRadius = 50
+                                        self.profileImage.layer.masksToBounds = true
                                         self.backgroundImage.image = downloadedImage
                                     }
                                 }
@@ -109,6 +111,17 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
         
         skillsTable.tableFooterView = UIView()
         wantsTable.tableFooterView = UIView()
+    }
+    
+    @IBAction func matchButton(_ sender: AnyObject) {
+        // if not yet requested, add request to Parse column and change button label
+        // if already match, label = matched
+        // then we will add a new controller of chats
+        let requestedArray = PFUser.current()?["MatchRequest"] as? NSArray
+        print("requestedArray \(requestedArray)")
+        
+        
+        
     }
 
     
@@ -135,11 +148,13 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
         if tableView == skillsTable {
             let cell = tableView.dequeueReusableCell(withIdentifier: "SkillCell", for: indexPath)
             cell.textLabel?.text = self.skills[indexPath.row]
+            cell.textLabel?.font = UIFont(name: "AvenirNext-Regular", size: 11)
             return cell
         } else {
             // wants Table
             let cell = tableView.dequeueReusableCell(withIdentifier: "WantsCell", for: indexPath)
             cell.textLabel?.text = self.interests[indexPath.row]
+            cell.textLabel?.font = UIFont(name: "AvenirNext-Regular", size: 11)
             return cell
         }
         

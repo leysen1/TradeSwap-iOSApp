@@ -13,6 +13,7 @@ import Parse
 // When saving new image, may need to add a unique name of image, in order to find it when deleting
 // In the load for wantSkillTable, change grey labels
 // Add pop up full screen image view
+// Maybe change the table view to include a description of each upload, then click for full size image
 
 class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
@@ -29,7 +30,7 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
     
     @IBOutlet var skillLabel: UILabel!
     @IBOutlet var descriptionText: UITextView!
-    @IBOutlet var saveButton: UIButton!
+    @IBOutlet var saveButton: UIBarButtonItem!
     @IBOutlet var addImageButton: UIBarButtonItem!
     
     
@@ -49,8 +50,8 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
 
     }
     
-
-    @IBAction func saveDescription(_ sender: AnyObject) {
+    
+    @IBAction func save(_ sender: AnyObject) {
         // spinner
         activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         activityIndicator.center = self.view.center
@@ -85,36 +86,37 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
                         self.activityIndicator.stopAnimating()
                         UIApplication.shared.endIgnoringInteractionEvents()
                         self.createAlert(title: "Saved", message: "Your description has been saved")
-                } else {
-                    // there are no objects yet 
-                    print("no objects")
-                    let descriptionObject = PFObject(className: "SkillDescription")
-                    descriptionObject["skill"] = self.skillDescriptionTitleSD
-                    descriptionObject["description"] = self.descriptionText.text
-                    descriptionObject["username"] = PFUser.current()?.username
-                    if self.hasSkillTableSD == true {
-                        descriptionObject["hasSkill"] = 1
                     } else {
-                        // wantsSkillTable
-                        descriptionObject["hasSkill"] = 0
-                    }
-
-                    descriptionObject.saveInBackground { (success, error) in
-                        if error != nil {
-                            print("error found")
-                            print(error)
+                        // there are no objects yet
+                        print("no objects")
+                        let descriptionObject = PFObject(className: "SkillDescription")
+                        descriptionObject["skill"] = self.skillDescriptionTitleSD
+                        descriptionObject["description"] = self.descriptionText.text
+                        descriptionObject["username"] = PFUser.current()?.username
+                        if self.hasSkillTableSD == true {
+                            descriptionObject["hasSkill"] = 1
                         } else {
-                            print("saved")
+                            // wantsSkillTable
+                            descriptionObject["hasSkill"] = 0
                         }
+                        
+                        descriptionObject.saveInBackground { (success, error) in
+                            if error != nil {
+                                print("error found")
+                                print(error)
+                            } else {
+                                print("saved")
+                            }
+                        }
+                        self.activityIndicator.stopAnimating()
+                        UIApplication.shared.endIgnoringInteractionEvents()
+                        self.createAlert(title: "Saved", message: "Your description has been saved")
                     }
-                    self.activityIndicator.stopAnimating()
-                    UIApplication.shared.endIgnoringInteractionEvents()
-                    self.createAlert(title: "Saved", message: "Your description has been saved")
                 }
             }
         }
+        
     }
-}
     
     
     @IBAction func addSkillImage(_ sender: AnyObject) {
@@ -243,7 +245,7 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         super.viewDidLoad()
         
         print("hasskill \(hasSkillTableSD)")
-
+       
         if editMode == false {
             // viewing another user's skill description
             if self.hasSkillTableSD == true {
@@ -251,7 +253,6 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
                 self.title = "Skill to Teach"
                 greyLabel2.text = "Skill Demonstrated"
                 
-                // hide imagebutton
             } else {
                 // a skill the user wants
                 self.title = "Skill to Learn"
@@ -261,8 +262,9 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
             skillLabel.text = "\(self.userSelectedSD)'s \(self.skillDescriptionTitleSD)"
             greyLabel1.text = "Description"
             saveButton.isEnabled = false
-            saveButton.alpha = 0
+            saveButton.tintColor = UIColor.clear
             addImageButton.isEnabled = false
+            addImageButton.tintColor = UIColor.clear
             
         } else {
             // editMode is true - viewing your profile

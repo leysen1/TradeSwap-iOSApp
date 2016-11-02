@@ -30,7 +30,9 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
     @IBOutlet var usernameLabel: UILabel!
     @IBOutlet var descriptionText: UITextView!
     @IBOutlet var profileImage: UIImageView!
+    @IBOutlet var backgroundImage: UIImageView!
     @IBOutlet var genderSwitch: UISwitch!
+    @IBOutlet var bioSkillsLabel: UILabel!
 
     @IBOutlet var hasSkillsTable: UITableView!
     @IBOutlet var wantsSkillsTable: UITableView!
@@ -85,6 +87,8 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
 
         // save area
         // drop down?
+        
+        self.viewDidLoad()
         
         turnSpinnerOff()
         
@@ -162,7 +166,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         
         usernameLabel.text = PFUser.current()?.username
-        
+
         // get saved photo
         if let photo = PFUser.current()?["photo"] as? PFFile {
     
@@ -171,6 +175,9 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
                 if let imageData = data {
                     if let downloadedImage = UIImage(data: imageData) {
                         self.profileImage.image = downloadedImage
+                        self.profileImage.layer.cornerRadius = 50
+                        self.profileImage.layer.masksToBounds = true
+                        self.backgroundImage.image = downloadedImage
                     }
                 }
             })
@@ -217,14 +224,14 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         if tableView == hasSkillsTable {
             let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
             cell.textLabel?.text = hasSkillsArray[indexPath.row]
-            cell.textLabel?.font = UIFont(name: "MarkerFelt-Thin", size: 15)
+            cell.textLabel?.font = UIFont(name: "AvenirNext-Regular", size: 11)
             turnSpinnerOff()
             return cell
             
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
             cell.textLabel?.text = wantsSkillsArray[indexPath.row]
-            cell.textLabel?.font = UIFont(name: "MarkerFelt-Thin", size: 15)
+            cell.textLabel?.font = UIFont(name: "AvenirNext-Regular", size: 11)
             
             turnSpinnerOff()
             return cell

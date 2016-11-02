@@ -28,7 +28,8 @@ class SkillsTableViewController: UITableViewController {
         super.viewDidLoad()
         
         skills()
-      
+        
+        tableView.tableFooterView = UIView()
     }
 
     

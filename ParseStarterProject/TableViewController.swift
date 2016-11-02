@@ -122,6 +122,8 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
                                 if let imageData = data {
                                     if let downloadedImage = UIImage(data: imageData) {
                                         cell.imageProfile.image = downloadedImage
+                                        cell.imageProfile.layer.cornerRadius = 25
+                                        cell.imageProfile.layer.masksToBounds = true
                                     }
                                 }
                             }
