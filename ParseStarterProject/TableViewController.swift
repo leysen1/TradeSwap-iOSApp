@@ -19,6 +19,15 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
     var students = [String]()
     var teachers = [String]()
     var userSelectedTV = String()
+    
+    func createAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
+
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
 
     @IBAction func logout(_ sender: AnyObject) {
         PFUser.logOut()
@@ -27,7 +36,7 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.title = "Potential Matches"
+        self.title = "Explore"
         // get students
         let query = PFQuery(className: "Skills")
         query.whereKey("hasSkill", contains: (PFUser.current()?.username!))
@@ -55,7 +64,54 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
        
         tableView.tableFooterView = UIView()
         
-
+        // check whether a request is matched up and change parse accordingly
+        let queryMatch = PFQuery(className: "_User")
+        queryMatch.whereKey("MatchAccepted", contains: (PFUser.current()?.username!)!)
+        queryMatch.findObjectsInBackground { (objects, error) in
+            if error != nil {
+                print(error)
+            } else {
+                var otherAccepted = [String]()
+                var userAccepted = [String]()
+                if let objects = objects {
+                    print("objects found")
+                    for object in objects {
+                        otherAccepted.append(object["username"] as! String)
+                    }
+                    print("otherAcceptedarray \(otherAccepted)")
+                    if let userQuery = PFUser.current()?["MatchAccepted"] as? NSArray {
+                        for i in userQuery {
+                            userAccepted.append(i as! String)
+                        }
+                        print("userAcceptedarray \(userAccepted)")
+                        
+                        for i in otherAccepted {
+                            if userAccepted.contains(i) {
+                                otherAccepted.remove(at: otherAccepted.index(of: i)!)
+                                
+                            }
+                            print("otherAccepted \(otherAccepted)")
+                        }
+                    }
+                    
+                }
+                if otherAccepted.count > 0 {
+                    print("you have matched with someone!")
+                    PFUser.current()?.addUniqueObjects(from: otherAccepted, forKey: "MatchAccepted")
+                    PFUser.current()?.removeObjects(in: otherAccepted, forKey: "MatchRequest")
+                    PFUser.current()?.saveInBackground(block: { (success, error) in
+                        if error != nil {
+                            print(error)
+                        } else {
+                            print("saved")
+                        }
+                    })
+                    self.createAlert(title: "You have new matches!", message: "Check out your chats and start talking.")
+                    
+                }
+            }
+        }
+        
     }
     
 
@@ -127,7 +183,14 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
                                     }
                                 }
                             }
+                        } else {
+                            // no image found
+                            cell.imageProfile.image = UIImage(named: "profile.png")
+                            cell.imageProfile.layer.cornerRadius = 25
+                            cell.imageProfile.layer.masksToBounds = true
+                            
                         }
+                        
                     }
                 } else {
                     print("no objects")

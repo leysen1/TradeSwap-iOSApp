@@ -95,7 +95,7 @@ class ViewController: UIViewController {
                     
                 } else {
                     print("user signed up")
-                    self.shouldPerformSegue(withIdentifier: "showTable", sender: self)
+                    self.performSegue(withIdentifier: "showTable", sender: nil)
                     // self.performSegue(withIdentifier: "mapSegue", sender: self)
                     
                 }
@@ -134,7 +134,7 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         
         
-        
+       
     }
 
 

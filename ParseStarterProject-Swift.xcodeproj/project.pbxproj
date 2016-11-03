@@ -10,6 +10,9 @@
 		511328661DC3F97B00A04B31 /* NeighbourhoodsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511328651DC3F97B00A04B31 /* NeighbourhoodsTableViewController.swift */; };
 		511E30AC1DC7AB34003CF68C /* MainTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511E30AB1DC7AB34003CF68C /* MainTableViewCell.swift */; };
 		511E30AE1DC7B707003CF68C /* PotentialMatchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511E30AD1DC7B707003CF68C /* PotentialMatchViewController.swift */; };
+		51575BD21DCBA15100061278 /* ChatTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51575BD11DCBA15100061278 /* ChatTableViewController.swift */; };
+		51575BD41DCBA8D200061278 /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51575BD31DCBA8D200061278 /* ChatTableViewCell.swift */; };
+		51575BD61DCBB0A500061278 /* IndivChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51575BD51DCBB0A500061278 /* IndivChatViewController.swift */; };
 		51783A671DBD0337005AA227 /* SkillsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51783A661DBD0337005AA227 /* SkillsTableViewController.swift */; };
 		51783A691DBE824C005AA227 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51783A681DBE824C005AA227 /* ProfileViewController.swift */; };
 		51783A6D1DBFD75E005AA227 /* profile.png in Resources */ = {isa = PBXBuildFile; fileRef = 51783A6C1DBFD75E005AA227 /* profile.png */; };
@@ -33,6 +36,9 @@
 		511328651DC3F97B00A04B31 /* NeighbourhoodsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NeighbourhoodsTableViewController.swift; sourceTree = "<group>"; };
 		511E30AB1DC7AB34003CF68C /* MainTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTableViewCell.swift; sourceTree = "<group>"; };
 		511E30AD1DC7B707003CF68C /* PotentialMatchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PotentialMatchViewController.swift; sourceTree = "<group>"; };
+		51575BD11DCBA15100061278 /* ChatTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatTableViewController.swift; sourceTree = "<group>"; };
+		51575BD31DCBA8D200061278 /* ChatTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
+		51575BD51DCBB0A500061278 /* IndivChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndivChatViewController.swift; sourceTree = "<group>"; };
 		51783A661DBD0337005AA227 /* SkillsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SkillsTableViewController.swift; sourceTree = "<group>"; };
 		51783A681DBE824C005AA227 /* ProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		51783A6C1DBFD75E005AA227 /* profile.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = profile.png; sourceTree = "<group>"; };
@@ -116,6 +122,9 @@
 				51783A741DBFE0D1005AA227 /* SkillDescriptionTableViewCell.swift */,
 				51783A681DBE824C005AA227 /* ProfileViewController.swift */,
 				51783A661DBD0337005AA227 /* SkillsTableViewController.swift */,
+				51575BD11DCBA15100061278 /* ChatTableViewController.swift */,
+				51575BD31DCBA8D200061278 /* ChatTableViewCell.swift */,
+				51575BD51DCBB0A500061278 /* IndivChatViewController.swift */,
 			);
 			path = ParseStarterProject;
 			sourceTree = "<group>";
@@ -223,8 +232,11 @@
 				511E30AE1DC7B707003CF68C /* PotentialMatchViewController.swift in Sources */,
 				51FF72261DBABF7400C60584 /* TableViewController.swift in Sources */,
 				51783A691DBE824C005AA227 /* ProfileViewController.swift in Sources */,
+				51575BD21DCBA15100061278 /* ChatTableViewController.swift in Sources */,
 				51783A6F1DBFDDFF005AA227 /* SkillDescriptionViewController.swift in Sources */,
 				81BA814B1A49DA1800E65899 /* AppDelegate.swift in Sources */,
+				51575BD41DCBA8D200061278 /* ChatTableViewCell.swift in Sources */,
+				51575BD61DCBB0A500061278 /* IndivChatViewController.swift in Sources */,
 				51783A671DBD0337005AA227 /* SkillsTableViewController.swift in Sources */,
 				51783A751DBFE0D1005AA227 /* SkillDescriptionTableViewCell.swift in Sources */,
 			);

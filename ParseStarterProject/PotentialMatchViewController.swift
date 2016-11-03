@@ -10,7 +10,7 @@ import UIKit
 import Parse
 
 class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
+    // add an unrequest button?
     
     var skills = [String]()
     var interests = [String]()
@@ -32,6 +32,9 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        skills.removeAll()
+        interests.removeAll()
         
         print("user selected \(userSelectedPM)")
 
@@ -69,6 +72,7 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
                     print("interests\(self.interests)")
                 }
             }
+            
         }
         
         
@@ -111,19 +115,98 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
         
         skillsTable.tableFooterView = UIView()
         wantsTable.tableFooterView = UIView()
+
+        // match button
+        if let requestedArray = PFUser.current()?["MatchRequest"] as? NSArray {
+            if (requestedArray.contains(self.userSelectedPM)) {
+                //match already requested
+                print("Match already requested")
+                self.matchButtonLabel.isEnabled = false
+                self.matchButtonLabel.setTitle("Match Requested", for: .normal)
+                self.matchButtonLabel.setTitleColor(UIColor.darkGray, for: .normal)
+            }
+        else {
+            if let acceptedArray = PFUser.current()?["MatchAccepted"] as? NSArray {
+                print("acceptedArray \(acceptedArray)")
+            if (acceptedArray.contains(self.userSelectedPM)) {
+                // match already accepted
+                print("Match already accepted")
+                self.matchButtonLabel.isEnabled = false
+                self.matchButtonLabel.setTitle("Matched", for: .normal)
+                self.matchButtonLabel.setTitleColor(UIColor.darkGray, for: .normal)
+                
+            } else {
+                // match not requested nor accepted
+                print("Please request match")
+                self.matchButtonLabel.isEnabled = true
+                self.matchButtonLabel.setTitle("Request Match", for: .normal)
+            }
+        }
+            }
+        }
     }
     
     @IBAction func matchButton(_ sender: AnyObject) {
-        // if not yet requested, add request to Parse column and change button label
-        // if already match, label = matched
-        // then we will add a new controller of chats
-        let requestedArray = PFUser.current()?["MatchRequest"] as? NSArray
-        print("requestedArray \(requestedArray)")
+        // we will add a new controller of chats
         
-        
-        
+        // button is only enable if not yet requested or accepted
+        PFUser.current()?.addUniqueObject(userSelectedPM, forKey: "MatchRequest")
+        PFUser.current()?.saveInBackground(block: { (success, error) in
+            if error != nil {
+                print(error)
+            } else {
+                print("Request saved")
+            }
+        })
+        // add if both have requested, then move both names to accepted list.
+        let userSelectedRequest = PFQuery(className: "_User")
+        userSelectedRequest.whereKey("username", equalTo: userSelectedPM)
+        userSelectedRequest.findObjectsInBackground { (objects, error) in
+            if error != nil {
+                print(error)
+            } else {
+                var userRequest = [String]()
+                if let objects = objects {
+                    for object in objects {
+                        if let requestArray = object["MatchRequest"] as? NSArray {
+                            for i in requestArray {
+                                userRequest.append(i as! String)
+                            }
+                        }
+                    }
+                    if userRequest.contains((PFUser.current()?.username!)!) {
+                        print("both matched")
+                    // can only save the current user
+                    PFUser.current()?.remove(self.userSelectedPM, forKey: "MatchRequest")
+                    PFUser.current()?.addUniqueObject(self.userSelectedPM, forKey: "MatchAccepted")
+                    PFUser.current()?.saveInBackground(block: { (success, error) in
+                        if error != nil {
+                            print(error)
+                        } else {
+                            print("saved user")
+                        }
+                    })
+                    }
+                }
+            }
+        }
+        viewDidLoad()
     }
-
+    
+    /*
+     for object in objects {
+     object.remove((PFUser.current()?.username!)!, forKey: "MatchRequest")
+     
+     object.addUniqueObject((PFUser.current()?.username!)!, forKey: "MatchAccepted")
+     object.saveInBackground(block: { (success, error) in
+     if error != nil {
+     print(error)
+     } else {
+     print("saved other user")
+     }
+     })
+     }
+ */
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
