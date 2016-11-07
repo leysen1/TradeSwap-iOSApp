@@ -28,6 +28,10 @@ class ChatTableViewController: UITableViewController {
         self.title = "Matches"
 
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+          navigationController?.toolbar.isHidden = false
+    }
 
 
     // MARK: - Table view data source
@@ -97,7 +101,7 @@ class ChatTableViewController: UITableViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if (segue.identifier == "ChatWithSegue") {
-            let IndivChat = segue.destination as! IndivChatViewController
+            let IndivChat = segue.destination as! IndivChatCollectionViewController
             IndivChat.respondent = respondentCT
         }
 
