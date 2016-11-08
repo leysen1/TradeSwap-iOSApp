@@ -695,6 +695,7 @@
                             <outlet property="delegate" destination="14c-OM-OIh" id="Dcw-mh-ZGH"/>
                         </connections>
                     </tableView>
+                    <toolbarItems/>
                     <connections>
                         <segue destination="ppO-VH-aRw" kind="show" identifier="ChatWithSegue" id="vgN-lC-Q9B"/>
                     </connections>
@@ -707,7 +708,7 @@
         <scene sceneID="KnE-Xa-j5o">
             <objects>
                 <collectionViewController id="ppO-VH-aRw" customClass="IndivChatCollectionViewController" customModule="ParseStarterProject_Swift" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="f0e-M1-obN">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" dataMode="prototypes" id="f0e-M1-obN">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -756,9 +757,13 @@
                             <outlet property="delegate" destination="ppO-VH-aRw" id="X9D-Ag-gWj"/>
                         </connections>
                     </collectionView>
-                    <nil key="simulatedBottomBarMetrics"/>
+                    <toolbarItems/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="375" height="667"/>
+                    <connections>
+                        <segue destination="YKC-Cd-rpN" kind="show" identifier="toProfileSegue" id="3ym-e9-XlB"/>
+                    </connections>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XnQ-Jt-qHn" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -790,6 +795,7 @@
         <image name="profile.png" width="512" height="512"/>
     </resources>
     <inferredMetricsTieBreakers>
+        <segue reference="3ym-e9-XlB"/>
         <segue reference="fc9-VC-ett"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -17,19 +17,23 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
     var content = [String]()
     var isSender = [Bool]()
     var bottomConstraint: NSLayoutConstraint?
-    
+    var respondentImage = UIImage()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+
+        
+        rightButtonItem.addTarget(self, action: #selector(seeProfile), for: UIControlEvents.touchUpInside)
+        rightButtonItem.setImage(respondentImage, for: UIControlState.normal)
+        let item = UIBarButtonItem(customView: rightButtonItem)
+        self.navigationItem.rightBarButtonItem = item
+        
         self.title = respondent
         navigationController?.toolbar.isHidden = true
         
-        getData()
         
-
-
-   
+        getData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -60,14 +64,16 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
         let dismissKeyboard = UITapGestureRecognizer(target: self, action: #selector(tap))
         view.addGestureRecognizer(dismissKeyboard)
         
-        let scrollDown = IndexPath(item: self.content.count - 1, section: 0)
-        self.collectionView?.scrollToItem(at: scrollDown, at: .bottom, animated: true)
+        if content.count > 0 {
+            let scrollDown = IndexPath(item: self.content.count - 1, section: 0)
+            self.collectionView?.scrollToItem(at: scrollDown, at: .bottom, animated: true)
         
-   
+        }
+        
+
     }
     
     func tap(gesture: UITapGestureRecognizer) {
-        
         
         UIView.animate(withDuration: 0, delay: 0, options: UIViewAnimationOptions.curveEaseOut, animations: {
             self.view.layoutIfNeeded()
@@ -173,7 +179,7 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
         
     }
     
-    //send button
+    //send a message button
     
     func sendMessage() {
         print("button tapped")
@@ -190,7 +196,6 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
             inputTextField.text = ""
             
         }
-
 
     }
  
@@ -211,8 +216,10 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
                 }, completion: { (completed) in
                     
                     if isKeyboardShowing {
-                        let scrollDown = IndexPath(item: self.content.count - 1, section: 0)
-                        self.collectionView?.scrollToItem(at: scrollDown, at: .bottom, animated: true)
+                        if self.content.count > 0 {
+                            let scrollDown = IndexPath(item: self.content.count - 1, section: 0)
+                            self.collectionView?.scrollToItem(at: scrollDown, at: .bottom, animated: true)
+                        }
                 }
             })
         }
@@ -240,8 +247,6 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
      
 
         let messageText = content[indexPath.row]
-        print("messageText \(messageText)")
-        
         
         let size = CGSize(width: 200, height: 1000)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
@@ -291,7 +296,36 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
     }
+    
+    // adding profile description button
+    
+    let rightButtonItem: UIButton = {
+        let button = UIButton(type: UIButtonType.custom)
+        button.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        button.layer.cornerRadius = 15
+        button.layer.masksToBounds = true
+        button.contentMode = .scaleAspectFill
 
+        button.isUserInteractionEnabled = true
+        
+        return button
+        
+    }()
+    
+    func seeProfile(sender: UIBarButtonItem) {
+        print("button pressed")
+        performSegue(withIdentifier: "toProfileSegue", sender: self)
+    }
+
+
+override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if (segue.identifier == "toProfileSegue") {
+        let PotentialVC = segue.destination as! PotentialMatchViewController
+        PotentialVC.userSelectedPM = respondent
+    }
+}
+    
+    
 
 }
 

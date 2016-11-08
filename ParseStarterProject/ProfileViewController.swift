@@ -37,6 +37,15 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
     @IBOutlet var hasSkillsTable: UITableView!
     @IBOutlet var wantsSkillsTable: UITableView!
     
+    func createAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
+
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    
     @IBAction func neighbourhoods(_ sender: AnyObject) {
         
     }
@@ -92,6 +101,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         turnSpinnerOff()
         
+        createAlert(title: "Saved", message: "Your profile has been stored")
         
     }
 
@@ -244,15 +254,18 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if tableView == hasSkillsTable {
-            self.skillDescriptionTitlePV = hasSkillsArray[indexPath.row]
-            hasSkillTablePV = true
-            performSegue(withIdentifier: "toSkillDesSegue", sender: nil)
-            
+            if self.hasSkillsArray.count > 0 {
+                self.skillDescriptionTitlePV = hasSkillsArray[indexPath.row]
+                hasSkillTablePV = true
+                performSegue(withIdentifier: "toSkillDesSegue", sender: nil)
+            }
         } else {
             // wantsSkillsTable
-            self.skillDescriptionTitlePV = wantsSkillsArray[indexPath.row]
-            hasSkillTablePV = false
-            performSegue(withIdentifier: "toSkillDesSegue", sender: nil)
+            if wantsSkillsArray.count > 0 {
+                self.skillDescriptionTitlePV = wantsSkillsArray[indexPath.row]
+                hasSkillTablePV = false
+                performSegue(withIdentifier: "toSkillDesSegue", sender: nil)
+            }
         }
         
         

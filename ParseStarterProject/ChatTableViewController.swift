@@ -13,6 +13,8 @@ class ChatTableViewController: UITableViewController {
 
     var chatArray = [String]()
     var respondentCT = String()
+    var respondentImageArray = [UIImage]()
+    var respondentImageCT = UIImage()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +27,7 @@ class ChatTableViewController: UITableViewController {
         }
         
         tableView.tableFooterView = UIView()
-        self.title = "Matches"
+        self.title = "Chats"
 
     }
     
@@ -50,6 +52,7 @@ class ChatTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ChatCell", for: indexPath) as! ChatTableViewCell
         
+        UIApplication.shared.beginIgnoringInteractionEvents()
         // get photo
         let queryPhoto = PFQuery(className: "_User")
         queryPhoto.whereKey("username", equalTo: chatArray[indexPath.row])
@@ -66,6 +69,7 @@ class ChatTableViewController: UITableViewController {
                             profileData.getDataInBackground { (data, error) in
                                 if let imageData = data {
                                     if let downloadedImage = UIImage(data: imageData) {
+                                        self.respondentImageArray.append(downloadedImage)
                                         cell.profileImage.image = downloadedImage
                                         cell.profileImage.layer.cornerRadius = 25
                                         cell.profileImage.layer.masksToBounds = true
@@ -74,6 +78,7 @@ class ChatTableViewController: UITableViewController {
                             }
                         } else {
                             // no image found
+                            self.respondentImageArray.append(UIImage(named: "profile.png")!)
                             cell.profileImage.image = UIImage(named: "profile.png")
                             cell.profileImage.layer.cornerRadius = 25
                             cell.profileImage.layer.masksToBounds = true
@@ -87,15 +92,20 @@ class ChatTableViewController: UITableViewController {
         
         cell.usernameLabel.text = chatArray[indexPath.row]
 
-
+        UIApplication.shared.endIgnoringInteractionEvents()
+        
         return cell
+        
+        
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        respondentCT = chatArray[indexPath.row]
-        performSegue(withIdentifier: "ChatWithSegue", sender: self)
-
+        if respondentImageArray.count > 0 {
+            respondentCT = chatArray[indexPath.row]
+            respondentImageCT = respondentImageArray[indexPath.row]
+            performSegue(withIdentifier: "ChatWithSegue", sender: self)
+        }
         
     }
     
@@ -103,6 +113,8 @@ class ChatTableViewController: UITableViewController {
         if (segue.identifier == "ChatWithSegue") {
             let IndivChat = segue.destination as! IndivChatCollectionViewController
             IndivChat.respondent = respondentCT
+            IndivChat.respondentImage = respondentImageCT
+            
         }
 
         
