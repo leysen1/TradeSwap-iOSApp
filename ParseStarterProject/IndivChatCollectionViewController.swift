@@ -237,26 +237,28 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
         cell.messageLabel.text = content[indexPath.row]
         cell.messageLabel.isEditable = false
         cell.messageLabel.isScrollEnabled = true
+     
 
         let messageText = content[indexPath.row]
         print("messageText \(messageText)")
         
-        let size = CGSize(width: 250, height: 1000)
-        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
-        let estimatedFrame = NSString(string: messageText).boundingRect(with: size, options: options, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14)], context: nil)
         
-        if isSender[indexPath.row] == true {
+        let size = CGSize(width: 200, height: 1000)
+        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+        let estimatedFrame = NSString(string: cell.messageLabel.text).boundingRect(with: size, options: options, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14)], context: nil)
+        
+       if isSender[indexPath.row] == true {
             // current user is sending
-            cell.messageLabel.frame = CGRect(x: self.view.frame.width - estimatedFrame.width - 8 , y: 0, width: estimatedFrame.width, height: estimatedFrame.height + 25 )
-            cell.textBubble.frame = CGRect(x: self.view.frame.width - estimatedFrame.width - 8 - 8, y: 0, width: estimatedFrame.width + 8, height: estimatedFrame.height + 25 )
+            cell.messageLabel.frame = CGRect(x: self.view.frame.width - estimatedFrame.width - 8 - 16 - 8, y: 0, width: estimatedFrame.width + 16, height: estimatedFrame.height + 15 )
+            cell.textBubble.frame = CGRect(x: self.view.frame.width - estimatedFrame.width - 16 - 16 - 8, y: 0, width: estimatedFrame.width + 24, height: estimatedFrame.height + 15 )
             
             cell.textBubble.backgroundColor = UIColor(red: 0, green: 137/255, blue: 249/255, alpha: 1)
             cell.messageLabel.textColor = UIColor.white
             
         } else {
             // received message
-            cell.messageLabel.frame = CGRect(x: 8, y: 0, width: estimatedFrame.width, height: estimatedFrame.height + 25 )
-            cell.textBubble.frame = CGRect(x: 0, y: 0, width: estimatedFrame.width + 8, height: estimatedFrame.height + 25 )
+            cell.messageLabel.frame = CGRect(x: 8, y: 0, width: estimatedFrame.width + 16, height: estimatedFrame.height + 15 )
+            cell.textBubble.frame = CGRect(x: 0, y: 0, width: estimatedFrame.width + 24, height: estimatedFrame.height + 15 )
             cell.textBubble.backgroundColor = UIColor(white: 0.95, alpha: 1)
             cell.messageLabel.textColor = UIColor.black
 
@@ -277,11 +279,11 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
         let messageText = content[indexPath.row]
 
             
-        let size = CGSize(width: 250, height: 1000)
+        let size = CGSize(width: 200, height: 1000)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
         let estimatedFrame = NSString(string: messageText).boundingRect(with: size, options: options, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14)], context: nil)
 
-        return CGSize(width: view.frame.width, height: estimatedFrame.height + 25 )
+        return CGSize(width: view.frame.width, height: estimatedFrame.height + 15)
         
         
     }
