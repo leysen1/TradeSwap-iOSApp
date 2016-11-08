@@ -12,18 +12,32 @@ import Parse
 
 class IndivChatCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
-    var array = [String]()
     var respondent = String()
     var members = [String]()
     var content = [String]()
     var isSender = [Bool]()
-    
     var bottomConstraint: NSLayoutConstraint?
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.title = respondent
+        navigationController?.toolbar.isHidden = true
+        
+        getData()
+        
+
+
+   
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
         // add container view
+        
         view.addSubview(messageInputContainerView)
+        setupInputComponents()
         
         let containerView = ["containerView" : messageInputContainerView]
         let horizontalConstraint = NSLayoutConstraint.constraints(withVisualFormat: "H:|[containerView]|", options: NSLayoutFormatOptions.alignAllCenterX, metrics: nil, views: containerView)
@@ -32,24 +46,41 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
         NSLayoutConstraint.activate(horizontalConstraint)
         NSLayoutConstraint.activate(verticalConstraint)
         
-        setupInputComponents()
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWasShown), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWasShown), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         bottomConstraint = NSLayoutConstraint(item: messageInputContainerView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
         view.addConstraint(bottomConstraint!)
+
+       
+        // send button
+        sendButton.addTarget(self, action: #selector(sendMessage), for: UIControlEvents.touchUpInside)
+        
+        // rid keyboard
+        let dismissKeyboard = UITapGestureRecognizer(target: self, action: #selector(tap))
+        view.addGestureRecognizer(dismissKeyboard)
+        
+        let scrollDown = IndexPath(item: self.content.count - 1, section: 0)
+        self.collectionView?.scrollToItem(at: scrollDown, at: .bottom, animated: true)
+        
+   
+    }
+    
+    func tap(gesture: UITapGestureRecognizer) {
         
         
-        navigationController?.toolbar.isHidden = true
-        
-        array = ["one","two","three","four"]
-        // Register cell classes
-        
-        self.title = respondent
-        let members = [respondent, (PFUser.current()?.username!)!]
-        print("members \(members)")
+        UIView.animate(withDuration: 0, delay: 0, options: UIViewAnimationOptions.curveEaseOut, animations: {
+            self.view.layoutIfNeeded()
+            }, completion: { (completed) in
+                self.inputTextField.resignFirstResponder()
+        })
+    }
+    
+    func getData() {
         
         // get messages
+        
+        let members = [respondent, (PFUser.current()?.username!)!]
         
         content.removeAll()
         
@@ -76,15 +107,8 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
                 }
             }
         }
-
         
-        sendButton.addTarget(self, action: #selector(sendMessage), for: UIControlEvents.touchUpInside)
-        
-
-    }
-    
-    func getData() {
-         }
+}
 
     
     // container view setup
@@ -147,7 +171,6 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
         NSLayoutConstraint.activate(horizontalConstraintBorder)
         NSLayoutConstraint.activate(verticalConstraintBorder)
         
-        
     }
     
     //send button
@@ -155,15 +178,20 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
     func sendMessage() {
         print("button tapped")
         
-        let newMessage = PFObject(className: "Messages")
-        newMessage["content"] = inputTextField.text
-        newMessage["sender"] = PFUser.current()?.username
-        newMessage["recipient"] = respondent
-        newMessage.saveInBackground()
-        
-        
-        getData()
-        
+        if inputTextField.text != "" {
+            let newMessage = PFObject(className: "Messages")
+            newMessage["content"] = inputTextField.text
+            newMessage["sender"] = PFUser.current()?.username
+            newMessage["recipient"] = respondent
+            newMessage.saveInBackground()
+         
+            viewDidLoad()
+            
+            inputTextField.text = ""
+            
+        }
+
+
     }
  
     
@@ -190,11 +218,6 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
         }
     }
     
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        inputTextField.endEditing(true)
-        
-    }
-    
     // message view
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -213,6 +236,7 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
         
         cell.messageLabel.text = content[indexPath.row]
         cell.messageLabel.isEditable = false
+        cell.messageLabel.isScrollEnabled = true
 
         let messageText = content[indexPath.row]
         print("messageText \(messageText)")
@@ -224,7 +248,8 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
         if isSender[indexPath.row] == true {
             // current user is sending
             cell.messageLabel.frame = CGRect(x: self.view.frame.width - estimatedFrame.width - 8 , y: 0, width: estimatedFrame.width, height: estimatedFrame.height + 25 )
-            cell.textBubble.frame = CGRect(x: self.view.frame.width - estimatedFrame.width - 8 - 8, y: 0, width: estimatedFrame.width, height: estimatedFrame.height + 25 )
+            cell.textBubble.frame = CGRect(x: self.view.frame.width - estimatedFrame.width - 8 - 8, y: 0, width: estimatedFrame.width + 8, height: estimatedFrame.height + 25 )
+            
             cell.textBubble.backgroundColor = UIColor(red: 0, green: 137/255, blue: 249/255, alpha: 1)
             cell.messageLabel.textColor = UIColor.white
             
@@ -236,7 +261,7 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
             cell.messageLabel.textColor = UIColor.black
 
             
-        }
+       }
 
         cell.textBubble.layer.cornerRadius = 15
         cell.textBubble.layer.masksToBounds = true
@@ -250,7 +275,7 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         let messageText = content[indexPath.row]
-        print("messageText \(messageText)")
+
             
         let size = CGSize(width: 250, height: 1000)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
