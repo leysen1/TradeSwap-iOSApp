@@ -13,16 +13,26 @@ class SkillsTableViewController: UITableViewController {
     
     /*
  To Do:
-
-     Make profile view nice
-     
-     Think about how to add skill evidence (on profile, click skill and it takes you to an upload page, like a feed.)
+     add functional search bar
+  
  */
     
     var skillsArray = [String]()
     var hasSkill = [String: Bool]()
     var wantsSkill = [String: Bool]()
     var showMySkills: Bool = true
+    let searchController = UISearchController(searchResultsController: nil)
+    var filteredSkillsArray = [String]()
+    
+    
+    func filterContentForSearchText(searchText: String, scope: String = "All") {
+        filteredSkillsArray = skillsArray.filter({ (skill) -> Bool in
+            return skill.lowercased().contains(searchText.lowercased())
+            
+        })
+        
+        tableView.reloadData()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,6 +40,11 @@ class SkillsTableViewController: UITableViewController {
         skills()
         
         tableView.tableFooterView = UIView()
+        
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = false
+        definesPresentationContext = true
+        tableView.tableHeaderView = searchController.searchBar
     }
 
     
@@ -49,6 +64,7 @@ class SkillsTableViewController: UITableViewController {
                         if let skillObject = skill["name"] as? String {
                             self.skillsArray.append(skillObject)
                             self.hasSkill[skillObject] = false
+                            self.wantsSkill[skillObject] = false
                             }
                             self.tableView.reloadData()
                         
@@ -80,7 +96,7 @@ class SkillsTableViewController: UITableViewController {
                                     if let objects = objects {
                                         for object in objects {
                                             let name = object["name"] as! String
-                                            self.hasSkill.updateValue(true, forKey: name)
+                                            self.wantsSkill.updateValue(true, forKey: name)
                                         }
                                     }
                                     self.tableView.reloadData()
@@ -101,6 +117,7 @@ class SkillsTableViewController: UITableViewController {
     override func viewDidAppear(_ animated: Bool) {
         
         print("has skills: \(self.hasSkill)")
+        print("wants skills: \(self.wantsSkill)")
         print("all skills: \(self.skillsArray)")
         
         if showMySkills == true {
@@ -118,18 +135,59 @@ class SkillsTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
+        
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return filteredSkillsArray.count
+        }
+        
         return self.skillsArray.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        cell.textLabel?.text = self.skillsArray[indexPath.row]
-
-        if hasSkill[skillsArray[indexPath.row]]! {
-            cell.accessoryType = UITableViewCellAccessoryType.checkmark
-        }
         
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        // need to update the dictionary with checkmarks as well...
+        
+        if searchController.isActive && searchController.searchBar.text != "" {
+            // filtering 
+            
+            cell.textLabel?.text = self.filteredSkillsArray[indexPath.row]
+            
+            cell.accessoryType = UITableViewCellAccessoryType.none
+            
+            if self.showMySkills == true {
+            
+                if hasSkill[filteredSkillsArray[indexPath.row]]! {
+                    cell.accessoryType = UITableViewCellAccessoryType.checkmark
+                
+                }
+            } else {
+                // show my skills = false
+                if wantsSkill[filteredSkillsArray[indexPath.row]]! {
+                    cell.accessoryType = UITableViewCellAccessoryType.checkmark
+                }
+            }
+            
+        } else {
+            // no filter
+            
+            cell.textLabel?.text = self.skillsArray[indexPath.row]
+            
+            cell.accessoryType = UITableViewCellAccessoryType.none
+            
+            if self.showMySkills == true {
+                if hasSkill[skillsArray[indexPath.row]]! {
+                    cell.accessoryType = UITableViewCellAccessoryType.checkmark
+                }
+            } else {
+                // show my skills = false
+                if wantsSkill[skillsArray[indexPath.row]]! {
+                    cell.accessoryType = UITableViewCellAccessoryType.checkmark
+                }
+            }
+        }
+
         return cell
         
     }
@@ -137,11 +195,21 @@ class SkillsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath)
         
-        if hasSkill[skillsArray[indexPath.row]] == true {
-            //  unclicking a skill
-            hasSkill[skillsArray[indexPath.row]] = false
-            cell?.accessoryType = UITableViewCellAccessoryType.none
+        
+        if showMySkills == true {
+            // has Skills 
             
+            if hasSkill[skillsArray[indexPath.row]] == true {
+                // uncheck
+                hasSkill[skillsArray[indexPath.row]] = false
+                cell?.accessoryType = UITableViewCellAccessoryType.none
+            
+            } else {
+                // check
+                hasSkill[skillsArray[indexPath.row]] = true
+                cell?.accessoryType = UITableViewCellAccessoryType.checkmark
+            }
+
             let query = PFQuery(className: "Skills")
             query.whereKey("name", equalTo: skillsArray[indexPath.row])
             
@@ -151,17 +219,32 @@ class SkillsTableViewController: UITableViewController {
                 } else {
                     if let objects = objects {
                         for object in objects {
-                            object.remove((PFUser.current()?.username!)!, forKey: "hasSkill")
-                            object.saveInBackground()
+                            if self.hasSkill[self.skillsArray[indexPath.row]] == false {
+                                // remove skill
+                                object.remove((PFUser.current()?.username!)!, forKey: "hasSkill")
+                            } else {
+                                // add skill
+                                object.addUniqueObject((PFUser.current()?.username!)!, forKey: "hasSkill")
+                            }
+                                object.saveInBackground()
                         }
                     }
                 }
             })
             
         } else {
-            // clicking a skill
-            hasSkill[skillsArray[indexPath.row]] = true
-            cell?.accessoryType = UITableViewCellAccessoryType.checkmark
+            // wants Skills
+            
+            if wantsSkill[skillsArray[indexPath.row]] == true {
+                // uncheck
+                wantsSkill[skillsArray[indexPath.row]] = false
+                cell?.accessoryType = UITableViewCellAccessoryType.none
+                
+            } else {
+                // check
+                wantsSkill[skillsArray[indexPath.row]] = true
+                cell?.accessoryType = UITableViewCellAccessoryType.checkmark
+            }
             
             let query = PFQuery(className: "Skills")
             query.whereKey("name", equalTo: skillsArray[indexPath.row])
@@ -172,7 +255,13 @@ class SkillsTableViewController: UITableViewController {
                 } else {
                     if let objects = objects {
                         for object in objects {
-                            object.addUniqueObject((PFUser.current()?.username!)!, forKey: "hasSkill")
+                            if self.hasSkill[self.skillsArray[indexPath.row]] == false {
+                                // remove skill
+                                object.remove((PFUser.current()?.username!)!, forKey: "wantsSkill")
+                            } else {
+                                // add skill
+                                object.addUniqueObject((PFUser.current()?.username!)!, forKey: "wantsSkill")
+                            }
                             object.saveInBackground()
                         }
                     }
@@ -232,4 +321,10 @@ class SkillsTableViewController: UITableViewController {
     }
     */
 
+}
+
+extension SkillsTableViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        filterContentForSearchText(searchText: searchController.searchBar.text!)
+    }
 }

@@ -13,7 +13,6 @@ import Parse
 
 class TableViewController: UITableViewController, UINavigationControllerDelegate {
     
-    // filter for people looking for your skill
     // shows users with similar interests in your area
     
     var students = [String]()
@@ -37,7 +36,7 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
         super.viewDidLoad()
         
         self.title = "Explore"
-        // get students
+        // get students who want a skill you have
         let query = PFQuery(className: "Skills")
         query.whereKey("hasSkill", contains: (PFUser.current()?.username!))
         query.findObjectsInBackground { (objects, error) in
@@ -61,6 +60,34 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
                 print("students \(self.students)")
             }
         }
+        
+        // get student who have a skill you want 
+        
+        let query2 = PFQuery(className: "Skills")
+        query2.whereKey("wantsSkill", contains: (PFUser.current()?.username!))
+        query2.findObjectsInBackground { (objects, error) in
+            if error != nil {
+                print(error)
+            } else {
+                if let objects = objects {
+                    for object in objects {
+                        if let studentCol = object["hasSkill"] as? NSArray {
+                            for student in studentCol {
+                                if self.students.contains(student as! String) == false {
+                                    self.students.append(student as! String)
+                                } else {
+                                    //do nothing
+                                }
+                            }
+                        }
+                    }
+                    self.tableView.reloadData()
+                }
+                print("students \(self.students)")
+            }
+        }
+        
+        
        
         tableView.tableFooterView = UIView()
         

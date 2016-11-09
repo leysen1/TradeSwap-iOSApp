@@ -9,6 +9,7 @@
 import UIKit
 import Parse
 
+// sending message still can be a bit buggy
 
 class IndivChatCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
