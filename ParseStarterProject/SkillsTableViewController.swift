@@ -13,7 +13,7 @@ class SkillsTableViewController: UITableViewController {
     
     /*
  To Do:
-     add functional search bar
+     sort table sections into groups
   
  */
     
@@ -195,19 +195,33 @@ class SkillsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath)
         
+        var searchActive = false
         
         if showMySkills == true {
             // has Skills 
-            
-            if hasSkill[skillsArray[indexPath.row]] == true {
-                // uncheck
-                hasSkill[skillsArray[indexPath.row]] = false
-                cell?.accessoryType = UITableViewCellAccessoryType.none
-            
+            // filter
+            if searchController.isActive && searchController.searchBar.text != "" {
+                searchActive = true
+                if hasSkill[filteredSkillsArray[indexPath.row]] == true {
+                    hasSkill[filteredSkillsArray[indexPath.row]] = false
+                    cell?.accessoryType = UITableViewCellAccessoryType.none
+                } else {
+                    hasSkill[filteredSkillsArray[indexPath.row]] = true
+                    cell?.accessoryType = UITableViewCellAccessoryType.checkmark
+                    }
             } else {
-                // check
-                hasSkill[skillsArray[indexPath.row]] = true
-                cell?.accessoryType = UITableViewCellAccessoryType.checkmark
+                // no filter
+                searchActive = false
+                if hasSkill[skillsArray[indexPath.row]] == true {
+                    // uncheck
+                    hasSkill[skillsArray[indexPath.row]] = false
+                    cell?.accessoryType = UITableViewCellAccessoryType.none
+            
+                } else {
+                    // check
+                    hasSkill[skillsArray[indexPath.row]] = true
+                    cell?.accessoryType = UITableViewCellAccessoryType.checkmark
+                }
             }
 
             let query = PFQuery(className: "Skills")
@@ -219,14 +233,30 @@ class SkillsTableViewController: UITableViewController {
                 } else {
                     if let objects = objects {
                         for object in objects {
-                            if self.hasSkill[self.skillsArray[indexPath.row]] == false {
-                                // remove skill
-                                object.remove((PFUser.current()?.username!)!, forKey: "hasSkill")
-                            } else {
-                                // add skill
-                                object.addUniqueObject((PFUser.current()?.username!)!, forKey: "hasSkill")
-                            }
+                            if searchActive {
+                                print("search active")
+                                // filter
+                                if self.hasSkill[self.filteredSkillsArray[indexPath.row]]! == false {
+                                    print("unchecked")
+                                    object.remove((PFUser.current()?.username!)!, forKey: "hasSkill")
+                                } else {
+                                    object.addUniqueObject((PFUser.current()?.username!)!, forKey: "hasSkill")
+                                    print("checked")
+                                }
                                 object.saveInBackground()
+                            } else {
+                            // no filter
+                                if self.hasSkill[self.skillsArray[indexPath.row]]! == false {
+                                // remove skill
+                                    object.remove((PFUser.current()?.username!)!, forKey: "hasSkill")
+                                } else {
+                                // add skill
+                                    object.addUniqueObject((PFUser.current()?.username!)!, forKey: "hasSkill")
+                                }
+                                object.saveInBackground()
+                            }
+                            
+                            
                         }
                     }
                 }
@@ -235,17 +265,27 @@ class SkillsTableViewController: UITableViewController {
         } else {
             // wants Skills
             
-            if wantsSkill[skillsArray[indexPath.row]] == true {
-                // uncheck
-                wantsSkill[skillsArray[indexPath.row]] = false
-                cell?.accessoryType = UITableViewCellAccessoryType.none
-                
+            if searchController.isActive && searchController.searchBar.text != "" {
+                searchActive = true
+                if wantsSkill[filteredSkillsArray[indexPath.row]] == true { // uncheck
+                    wantsSkill[filteredSkillsArray[indexPath.row]] = false
+                    cell?.accessoryType = UITableViewCellAccessoryType.none
+                } else { // check
+                    wantsSkill[filteredSkillsArray[indexPath.row]] = true
+                    cell?.accessoryType = UITableViewCellAccessoryType.checkmark
+                }
             } else {
-                // check
-                wantsSkill[skillsArray[indexPath.row]] = true
-                cell?.accessoryType = UITableViewCellAccessoryType.checkmark
+            // no filter
+                searchActive = false
+                if wantsSkill[skillsArray[indexPath.row]] == true { // uncheck
+                    wantsSkill[skillsArray[indexPath.row]] = false
+                    cell?.accessoryType = UITableViewCellAccessoryType.none
+                
+                } else { // check
+                    wantsSkill[skillsArray[indexPath.row]] = true
+                    cell?.accessoryType = UITableViewCellAccessoryType.checkmark
+                }
             }
-            
             let query = PFQuery(className: "Skills")
             query.whereKey("name", equalTo: skillsArray[indexPath.row])
             
@@ -255,14 +295,27 @@ class SkillsTableViewController: UITableViewController {
                 } else {
                     if let objects = objects {
                         for object in objects {
-                            if self.hasSkill[self.skillsArray[indexPath.row]] == false {
-                                // remove skill
-                                object.remove((PFUser.current()?.username!)!, forKey: "wantsSkill")
+                            if searchActive {
+                                // filter
+                                if self.wantsSkill[self.filteredSkillsArray[indexPath.row]]! == false {
+                                    object.remove((PFUser.current()?.username!)!, forKey: "wantsSkill")
+                                } else {
+                                    object.addUniqueObject((PFUser.current()?.username!)!, forKey: "wantsSkill")
+                                }
+                                object.saveInBackground()
                             } else {
-                                // add skill
-                                object.addUniqueObject((PFUser.current()?.username!)!, forKey: "wantsSkill")
+                                // no filter
+                                if self.wantsSkill[self.skillsArray[indexPath.row]]! == false {
+                                    // remove skill
+                                    object.remove((PFUser.current()?.username!)!, forKey: "wantsSkill")
+                                } else {
+                                    // add skill
+                                    object.addUniqueObject((PFUser.current()?.username!)!, forKey: "wantsSkill")
+                                }
+                                object.saveInBackground()
                             }
-                            object.saveInBackground()
+                            
+                            
                         }
                     }
                 }

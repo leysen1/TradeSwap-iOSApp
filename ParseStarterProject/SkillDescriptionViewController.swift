@@ -10,8 +10,8 @@
 import UIKit
 import Parse
 
+// its ugly.
 // When saving new image, may need to add a unique name of image, in order to find it when deleting
-// In the load for wantSkillTable, change grey labels
 // Add pop up full screen image view
 // Maybe change the table view to include a description of each upload, then click for full size image
 

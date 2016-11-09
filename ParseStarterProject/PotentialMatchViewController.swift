@@ -40,7 +40,7 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
 
         userProfileLabel.text = userSelectedPM
         userSkillsLabel.text = "\(userSelectedPM)'s Skills"
-        userWantsLabel.text = "\(userSelectedPM) would like to learn:"
+        userWantsLabel.text = "\(userSelectedPM)'s Wants"
         
         let querySkills = PFQuery(className: "Skills")
         querySkills.whereKey("hasSkill", contains: userSelectedPM)

@@ -18,6 +18,8 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
     var students = [String]()
     var teachers = [String]()
     var userSelectedTV = String()
+    var currentUserInterests = [String]()
+    var username = (PFUser.current()?.username!)!
     
     func createAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
@@ -35,6 +37,7 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        currentUserInterests.removeAll()
         self.title = "Explore"
         // get students who want a skill you have
         let query = PFQuery(className: "Skills")
@@ -45,6 +48,13 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
             } else {
                 if let objects = objects {
                     for object in objects {
+                        // add current user skills
+                        if self.currentUserInterests.contains(object["name"] as! String) == false {
+                            self.currentUserInterests.append(object["name"] as! String)
+                        } else {
+                            // do nothing
+                        }
+                        // find students who want a relevant skill
                         if let studentCol = object["wantsSkill"] as? NSArray {
                             for student in studentCol {
                                 if self.students.contains(student as! String) == false {
@@ -71,6 +81,13 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
             } else {
                 if let objects = objects {
                     for object in objects {
+                        // add current user skills 
+                        if self.currentUserInterests.contains(object["name"] as! String) == false {
+                            self.currentUserInterests.append(object["name"] as! String)
+                        } else {
+                            // do nothing
+                        }
+                        // find students who have a relevant skill
                         if let studentCol = object["hasSkill"] as? NSArray {
                             for student in studentCol {
                                 if self.students.contains(student as! String) == false {
@@ -81,11 +98,16 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
                             }
                         }
                     }
+                    if self.students.contains(self.username) {
+                        self.students.remove(at: self.students.index(of: self.username)!)
+                        print("students \(self.students)")
+                    }
+                    
                     self.tableView.reloadData()
                 }
-                print("students \(self.students)")
-            }
+                print("current user interests \(self.currentUserInterests)")
         }
+    }
         
         
        
@@ -165,17 +187,23 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
 
         cell.userLabel.text = students[indexPath.row]
         
-        // get interested in
-        let query = PFQuery(className: "Skills")
-        query.whereKey("wantsSkill", contains: students[indexPath.row])
-        query.findObjectsInBackground { (objects, error) in
+        // prospective match wants skill
+        let queryWants = PFQuery(className: "Skills")
+        queryWants.whereKey("wantsSkill", contains: students[indexPath.row])
+        queryWants.findObjectsInBackground { (objects, error) in
             if error != nil {
                 print(error)
             } else {
                 var interests = [String]()
                 if let objects = objects {
                     for object in objects {
-                        interests.append(object["name"] as! String)
+                        if self.currentUserInterests.contains(object["name"] as! String) == true {
+                            if interests.contains(object["name"] as! String) == false {
+                                interests.append(object["name"] as! String)
+                            }
+                        } else {
+                            // do nothing
+                        }
                     }
                     var interestsString = String()
                     for item in interests {
@@ -183,6 +211,37 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
                         interestsString.append(", ")
                     }
                     interestsString = String(interestsString.characters.dropLast(2))
+                    print("interestsstring \(interestsString)")
+                    cell.interestedInLabel.text = "Interest's: \(interestsString)"
+                }
+            }
+        }
+        
+        // prospective match has skill
+        let queryHas = PFQuery(className: "Skills")
+        queryHas.whereKey("hasSkill", contains: students[indexPath.row])
+        queryHas.findObjectsInBackground { (objects, error) in
+            if error != nil {
+                print(error)
+            } else {
+                var interests = [String]()
+                if let objects = objects {
+                    for object in objects {
+                        if self.currentUserInterests.contains(object["name"] as! String) == true {
+                            if interests.contains(object["name"] as! String) == false {
+                                interests.append(object["name"] as! String)
+                            }
+                        } else {
+                            // do nothing
+                        }
+                    }
+                    var interestsString = String()
+                    for item in interests {
+                        interestsString.append(item)
+                        interestsString.append(", ")
+                    }
+                    interestsString = String(interestsString.characters.dropLast(2))
+                    print("interestsstring \(interestsString)")
                     cell.interestedInLabel.text = "Interested in: \(interestsString)"
                 }
             }

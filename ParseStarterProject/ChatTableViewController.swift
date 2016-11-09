@@ -10,6 +10,8 @@ import UIKit
 import Parse
 
 class ChatTableViewController: UITableViewController {
+    
+    // in cell write most recent message content
 
     var chatArray = [String]()
     var respondentCT = String()
