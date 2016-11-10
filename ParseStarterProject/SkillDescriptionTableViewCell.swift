@@ -11,6 +11,8 @@ import UIKit
 class SkillDescriptionTableViewCell: UITableViewCell {
 
     @IBOutlet var tableImage: UIImageView!
+
+    @IBOutlet var evidenceLabel: UITextView!
     
     
     override func awakeFromNib() {
