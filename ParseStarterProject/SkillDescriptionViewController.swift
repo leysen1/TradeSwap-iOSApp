@@ -19,26 +19,34 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
     var imageFiles = [PFFile]()
     var descriptionLabel = [String]()
     var fileDescription = [String]()
-    var newImage = UIImage()
-    var screenImage = UIImage()
     var activityIndicator = UIActivityIndicatorView()
     var editMode = false
     var userSelectedSD = String()
     var skillDescriptionTitleSD = ""
-    var hasSkillTableSD: Bool = true
+    var hasSkillTableSD = true
+    var addNewImageSD = true
+    var evidenceTitleSD = ""
+    var chosenImageSD = [PFFile]()
+    
   
     
     @IBOutlet var skillLabel: UILabel!
     @IBOutlet var descriptionText: UITextView!
     @IBOutlet var saveButton: UIBarButtonItem!
-    @IBOutlet var addImageButton: UIBarButtonItem!
-    
-    
+
     @IBOutlet var greyLabel1: UILabel!
     @IBOutlet var greyLabel2: UILabel!
     
     @IBOutlet var tableView: UITableView!
     
+    
+    @IBOutlet var addImageLabel: UIBarButtonItem!
+    
+    @IBAction func addImage(_ sender: AnyObject) {
+        addNewImageSD = true
+        self.performSegue(withIdentifier: "toSkillCellView", sender: self)
+        
+    }
     
     func createAlert(title: String, message: String) {
         
@@ -119,126 +127,9 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         
     }
     
-    
-    @IBAction func addSkillImage(_ sender: AnyObject) {
-        
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
-        imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary
-        imagePicker.allowsEditing = false
-        
-        self.present(imagePicker, animated: true, completion: nil)
-        
-    }
-    
-    var tField: UITextField!
-    
-    func configurationTextField(textField: UITextField!)
-    {
-        print("generating the TextField")
-        textField.placeholder = "Enter an item"
-        tField = textField
-    }
-    
-    func handleCancel(alertView: UIAlertAction!)
-    {
-        print("Cancelled !!")
-    }
-    
-    func newAlert() {
-        let alert = UIAlertController(title: "Enter Input", message: "", preferredStyle: .alert)
-        
-        alert.addTextField(configurationHandler: configurationTextField)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler:handleCancel))
-        alert.addAction(UIAlertAction(title: "Done", style: .default, handler:{ (UIAlertAction) in
-            print("Done !!")
-            
-            print("Item : \(self.tField.text)")
-        }))
-        self.present(alert, animated: true, completion: nil)
-        
-    }
-    
-    var alertTextfield: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "Enter message..."
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        return textField
-    }()
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
-        if let imageProfile = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            newImage = imageProfile
-            print("See new image")
-            print(newImage)
-            
-            // pop up a textbox to put in title of image
-            
-            // spinner
-            activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-            activityIndicator.center = self.view.center
-            activityIndicator.hidesWhenStopped = true
-            activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
-            view.addSubview(activityIndicator)
-            activityIndicator.startAnimating()
-            UIApplication.shared.beginIgnoringInteractionEvents()
-            
-            // save picture
-            let skillDescriptions = PFObject(className: "SkillDescription")
-            skillDescriptions["skill"] = self.skillDescriptionTitleSD
-            skillDescriptions["description"] = self.descriptionText.text
-            skillDescriptions["username"] = PFUser.current()?.username
-            if self.hasSkillTableSD == true {
-                skillDescriptions["hasSkill"] = 1
-            } else {
-                // wantsSkillTable
-                skillDescriptions["hasSkill"] = 0
-            }
-            
-            let imageData = UIImageJPEGRepresentation(self.newImage, 0.8)
-            skillDescriptions["skillFile"] = PFFile(name: "image.png", data: imageData!)
-            
-            
-            skillDescriptions.saveInBackground { (success, error) in
-                if error != nil {
-                    print("error found")
-                    print(error)
-                } else {
-                    print("saved")
-                }
-            }
-            self.dismiss(animated: true, completion: nil)
-            self.activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
-            
-            createAlert(title: "Saved", message: "Your uploaded image has been saved")
-            
-            
-            
-            /*
-            let alert = UIAlertView()
-            alert.title = "Enter a title for your upload"
-            alert.addButton(withTitle: "Save")
-            alert.addButton(withTitle: "Cancel")
-            alert.alertViewStyle = UIAlertViewStyle.plainTextInput
-            self.alertTextfield = alert.textField(at: 0)!
-            alert.addSubview(alertTextfield)
-            
-            alert.show()
-            
-            print("alertTextfield \(self.alertTextfield.text)")
- 
-            */
-            
-        }
 
-    }
-    
-    func savePicture() {
-        
-    }
-    
     func refresh() {
+        // get table view data
         
         // spinner
         activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
@@ -251,6 +142,10 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         
         imageFiles.removeAll()
         descriptionLabel.removeAll()
+        fileDescription.removeAll()
+        evidenceTitleSD = ""
+        chosenImageSD.removeAll()
+        
         
         // creating the image array from the saved PFFiles
         let query = PFQuery(className: "SkillDescription")
@@ -329,8 +224,8 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
             greyLabel1.text = "Description"
             saveButton.isEnabled = false
             saveButton.tintColor = UIColor.clear
-            addImageButton.isEnabled = false
-            addImageButton.tintColor = UIColor.clear
+            addImageLabel.isEnabled = false
+            addImageLabel.tintColor = UIColor.clear
             
         } else {
             // editMode is true - viewing your profile
@@ -354,11 +249,12 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         }
         print("hasSkillTableSD \(hasSkillTableSD)")
         refresh()
+        
     }
     
     
     override func viewDidAppear(_ animated: Bool) {
-        refresh()
+        
         self.tableView.reloadData()
         self.tableView.tableFooterView = UIView()
         
@@ -390,18 +286,46 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         }
         return cell
     }
+
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.allowsSelectionDuringEditing = true
-        
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if (editingStyle == UITableViewCellEditingStyle.delete) {
+            
+            imageFiles.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath as IndexPath], with: .fade)
+            
+            // save delete in Parse
+            let query = PFQuery(className: "SkillDescription")
+            query.whereKey("skill", equalTo: self.skillDescriptionTitleSD)
+            query.whereKey("username", equalTo: (PFUser.current()?.username!)!)
+            query.whereKey("fileDes", equalTo: self.fileDescription[indexPath.row])
+            if self.hasSkillTableSD == true {
+                query.whereKey("hasSkill", equalTo: 1)
+            } else {
+                query.whereKey("hasSkill", equalTo: 0)
+            }
+            query.findObjectsInBackground(block: { (objects, error) in
+                if error != nil {
+                    print(error)
+                } else {
+                    if let objects = objects {
+                        for object in objects {
+                            object.deleteInBackground()
+                        }
+                       
+                    }
+                }
+            })
+            print("deleted")
+
+        }
     }
     
-    
-    
-    @IBAction func addImage(_ sender: AnyObject) {
-        self.performSegue(withIdentifier: "toSkillCellView", sender: self)
-        
-    }
+
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if (segue.identifier == "toSkillCellView") {
@@ -409,23 +333,24 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
             skillCell.skillDescriptionTitleSC = skillDescriptionTitleSD
             skillCell.generalDescriptionText = descriptionText.text
             skillCell.hasSkillTableSC = hasSkillTableSD
+            skillCell.addNewImage = addNewImageSD
+            if addNewImageSD == false {
+                skillCell.evidenceTitle = evidenceTitleSD
+                skillCell.chosenImage.append(chosenImageSD[0])
+            }
+            
+        }
     }
     
-   /*
+   
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SkillDescriptionTableViewCell
-
-
-        if let fullImage: UIImage = cell.tableImage.image {
-            let fullImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
-            fullImageView.image = fullImage
-            self.view.addSubview(fullImageView)
-            fullScreen = true
-        }
         
+        addNewImageSD = false
+        evidenceTitleSD = fileDescription[indexPath.row]
+        chosenImageSD.append(imageFiles[indexPath.row])
         
+        performSegue(withIdentifier: "toSkillCellView", sender: nil)
+     
     }
-*/
 
-    }
 }
