@@ -10,12 +10,13 @@
 import UIKit
 import Parse
 
-// When saving new image, may need to add a unique name of image, in order to find it when deleting
-// Add pop up full screen image view
-// Maybe change the table view to include a description of each upload, then click for full size image
+
+
+// skill cell not showing different images
 
 class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
+
+
     var imageFiles = [PFFile]()
     var descriptionLabel = [String]()
     var fileDescription = [String]()
@@ -130,7 +131,7 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
 
     func refresh() {
         // get table view data
-        
+
         // spinner
         activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         activityIndicator.center = self.view.center
@@ -140,12 +141,7 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         activityIndicator.startAnimating()
         UIApplication.shared.beginIgnoringInteractionEvents()
         
-        imageFiles.removeAll()
-        descriptionLabel.removeAll()
-        fileDescription.removeAll()
-        evidenceTitleSD = ""
-        chosenImageSD.removeAll()
-        
+
         
         // creating the image array from the saved PFFiles
         let query = PFQuery(className: "SkillDescription")
@@ -168,6 +164,12 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
             } else {
                 // create image array
                 if let rows = objects {
+                    self.imageFiles.removeAll()
+                    self.descriptionLabel.removeAll()
+                    self.fileDescription.removeAll()
+                    self.evidenceTitleSD = ""
+                    self.chosenImageSD.removeAll()
+                    
                     for row in rows {
                       // if let object = row as? PFObject {
                         if row["skillFile"] != nil {
@@ -248,8 +250,9 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
             }
         }
         print("hasSkillTableSD \(hasSkillTableSD)")
-        refresh()
         
+        
+       
     }
     
     
@@ -258,7 +261,7 @@ class SkillDescriptionViewController: UIViewController, UITableViewDelegate, UIT
         self.tableView.reloadData()
         self.tableView.tableFooterView = UIView()
         
-
+        refresh()
     }
 
 

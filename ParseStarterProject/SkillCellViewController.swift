@@ -11,6 +11,8 @@ import Parse
 
 class SkillCellViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
+    // Add pop up full screen image view
+    
     var activityIndicator = UIActivityIndicatorView()
     var newImage: UIImage?
     var skillDescriptionTitleSC = String()
@@ -118,10 +120,27 @@ class SkillCellViewController: UIViewController, UIImagePickerControllerDelegate
             createAlert(title: "No Image Chosen", message: "Please try again")
         }
     }
+    
+    func imageTapped(sender: UITapGestureRecognizer) {
+        let imageView = sender.view as! UIImageView
+        let newImageView = UIImageView(image: imageView.image)
+        newImageView.frame = self.view.frame
+        newImageView.backgroundColor = UIColor.black
+        newImageView.contentMode = .scaleAspectFit
+        newImageView.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissFullscreenImage))
+        newImageView.addGestureRecognizer(tap)
+        self.view.addSubview(newImageView)
+    }
+    
+    func dismissFullscreenImage(sender: UITapGestureRecognizer) {
+        sender.view?.removeFromSuperview()
+    }
         
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         
         if addNewImage {
             self.title = "Import an Image"
@@ -131,6 +150,7 @@ class SkillCellViewController: UIViewController, UIImagePickerControllerDelegate
             self.addImageButton.isEnabled = true
             self.addImageButton.tintColor = UIColor.blue
             self.imageTitle.backgroundColor = UIColor.groupTableViewBackground
+            self.imageView.isUserInteractionEnabled = false
             
             let saveButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.save, target: self, action: #selector(savePage))
             self.navigationItem.rightBarButtonItem  = saveButton
@@ -140,6 +160,16 @@ class SkillCellViewController: UIViewController, UIImagePickerControllerDelegate
         
         } else {
             // clicked on existing image
+            
+            // add image
+            self.chosenImage[0].getDataInBackground { (data, error) in
+                if let imageData = data {
+                    if let downloadedImage = UIImage(data: imageData) {
+                        self.imageView.image = downloadedImage
+                    }
+                }
+            }
+            
             self.title = evidenceTitle
             self.pageLabel.isHidden = true
             self.imageTitle.isEditable = false
@@ -147,15 +177,10 @@ class SkillCellViewController: UIViewController, UIImagePickerControllerDelegate
             self.addImageButton.tintColor = UIColor.clear
             self.imageTitle.backgroundColor = UIColor.clear
             self.imageView.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height / 2)
-            
-            // add image
-            self.chosenImage[0].getDataInBackground { (data, error) in
-            if let imageData = data {
-                if let downloadedImage = UIImage(data: imageData) {
-                    self.imageView.image = downloadedImage
-                }
-            }
-        }
+            let tapGestureRecognizer = UITapGestureRecognizer(target:self, action: #selector(imageTapped))
+            self.imageView.isUserInteractionEnabled = true
+            self.imageView.addGestureRecognizer(tapGestureRecognizer)
+
         
         }
 
