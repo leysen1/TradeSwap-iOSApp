@@ -17,6 +17,9 @@ class ChatTableViewController: UITableViewController {
     var respondentCT = String()
     var respondentImageArray = [UIImage]()
     var respondentImageCT = UIImage()
+    let username = (PFUser.current()?.username!)!
+    
+    var content = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +39,15 @@ class ChatTableViewController: UITableViewController {
     override func viewDidAppear(_ animated: Bool) {
           navigationController?.toolbar.isHidden = false
     }
+    
+    func getData() {
+        
+        // get messages
+        
+
+        
+    }
+
 
 
     // MARK: - Table view data source
@@ -88,6 +100,38 @@ class ChatTableViewController: UITableViewController {
                     }
                 } else {
                     print("no objects")
+                }
+            }
+        }
+        
+        // get last message sent 
+        
+        content.removeAll()
+        
+        let queryContent = PFQuery(className: "Messages")
+        queryContent.whereKey("recipient", equalTo: chatArray[indexPath.row])
+        queryContent.whereKey("sender", equalTo: self.username)
+        queryContent.findObjectsInBackground { (objects, error) in
+            if error != nil {
+                print(error)
+            } else {
+                print("found objects")
+                if let objects = objects {
+                    
+                    var tempContent = [String]()
+                    for object in objects {
+                        tempContent.removeAll()
+                        tempContent.append(object["content"] as! String)
+                    }
+                    if tempContent.count > 0 {
+                        let contentIndexNumber = tempContent.count - 1
+                        self.content.append(tempContent[contentIndexNumber])
+                    } else {
+                        self.content.append(" ")
+                    }
+                    
+                    cell.contentLabel.text = self.content[indexPath.row]
+                    tableView.reloadData()
                 }
             }
         }

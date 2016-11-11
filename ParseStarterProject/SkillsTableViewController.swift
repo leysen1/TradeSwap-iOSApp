@@ -17,6 +17,11 @@ class SkillsTableViewController: UITableViewController {
   
  */
     
+    struct SkillGroups {
+        var groupName : String!
+        var groupSkills : [String: Bool]!
+    }
+    
     var skillsArray = [String]()
     var hasSkill = [String: Bool]()
     var wantsSkill = [String: Bool]()
