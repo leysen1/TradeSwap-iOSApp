@@ -32,11 +32,13 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
     @IBOutlet var profileImage: UIImageView!
     @IBOutlet var backgroundImage: UIImageView!
     @IBOutlet var genderSwitch: UISwitch!
+    @IBOutlet var searchRadius: UITextField!
     @IBOutlet var bioSkillsLabel: UILabel!
 
     @IBOutlet var hasSkillsTable: UITableView!
     @IBOutlet var wantsSkillsTable: UITableView!
     
+
     func createAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
@@ -44,12 +46,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         }))
         self.present(alert, animated: true, completion: nil)
     }
-    
-    
-    @IBAction func neighbourhoods(_ sender: AnyObject) {
-        
-    }
-    
+
 
     @IBAction func updateImage(_ sender: AnyObject) {
         
@@ -86,17 +83,22 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         let text = descriptionText.text
         PFUser.current()?["description"] = text
         
+        // save radius
+        
+        if let radius = Double(searchRadius.text!) {
+            PFUser.current()?["searchRadius"] = radius
+        }
+
         PFUser.current()?.saveInBackground(block: { (success, error) in
             if error != nil {
                 print(error)
             } else {
-                print("image, gender, and description saved")
+                print("image, gender, radius and description saved")
             }
         })
 
-        // save area
-        // drop down?
-        
+
+
         self.viewDidLoad()
         
         turnSpinnerOff()
@@ -124,6 +126,15 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
    
 
     func refresh() {
+        
+        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        activityIndicator.center = self.view.center
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+        activityIndicator.startAnimating()
+        view.addSubview(activityIndicator)
+        UIApplication.shared.beginIgnoringInteractionEvents()
+        
         
         hasSkillsArray.removeAll()
         wantsSkillsArray.removeAll()
@@ -170,6 +181,9 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
             }
         }
         
+        activityIndicator.stopAnimating()
+        UIApplication.shared.endIgnoringInteractionEvents()
+        
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -205,7 +219,11 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
                 self.genderSwitch.setOn(false, animated: false)
             }
         }
-        // get area
+        
+        if let radius = PFUser.current()?["searchRadius"] as? Int {
+            self.searchRadius.text = String(radius)
+        }
+
         
     }
     
@@ -284,6 +302,8 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
             skillVC.showMySkills = showMySkillsPV
         }
     }
+    
+
     
     
     func turnSpinnerOn() {

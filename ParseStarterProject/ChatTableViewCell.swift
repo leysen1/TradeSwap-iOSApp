@@ -13,7 +13,7 @@ class ChatTableViewCell: UITableViewCell {
     
     @IBOutlet var profileImage: UIImageView!
     @IBOutlet var usernameLabel: UILabel!
-    @IBOutlet var contentLabel: UILabel!
+
     
     
     override func awakeFromNib() {

@@ -18,12 +18,11 @@ class ChatTableViewController: UITableViewController {
     var respondentImageArray = [UIImage]()
     var respondentImageCT = UIImage()
     let username = (PFUser.current()?.username!)!
-    
-    var content = [String]()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
+       chatArray.removeAll()
         if let testArray = PFUser.current()?["MatchAccepted"] as? NSArray {
             for i in testArray {
                 chatArray.append(i as! String)
@@ -31,6 +30,9 @@ class ChatTableViewController: UITableViewController {
             print("chatArray \(chatArray)")
         }
         
+        // get last message sent
+        
+
         tableView.tableFooterView = UIView()
         self.title = "Chats"
 
@@ -38,6 +40,7 @@ class ChatTableViewController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
           navigationController?.toolbar.isHidden = false
+        tableView.reloadData()
     }
     
     func getData() {
@@ -98,48 +101,16 @@ class ChatTableViewController: UITableViewController {
                             cell.profileImage.layer.masksToBounds = true
                         }
                     }
+                    cell.usernameLabel.text = self.chatArray[indexPath.row]
+                    UIApplication.shared.endIgnoringInteractionEvents()
+                    
                 } else {
                     print("no objects")
                 }
             }
         }
-        
-        // get last message sent 
-        
-        content.removeAll()
-        
-        let queryContent = PFQuery(className: "Messages")
-        queryContent.whereKey("recipient", equalTo: chatArray[indexPath.row])
-        queryContent.whereKey("sender", equalTo: self.username)
-        queryContent.findObjectsInBackground { (objects, error) in
-            if error != nil {
-                print(error)
-            } else {
-                print("found objects")
-                if let objects = objects {
-                    
-                    var tempContent = [String]()
-                    for object in objects {
-                        tempContent.removeAll()
-                        tempContent.append(object["content"] as! String)
-                    }
-                    if tempContent.count > 0 {
-                        let contentIndexNumber = tempContent.count - 1
-                        self.content.append(tempContent[contentIndexNumber])
-                    } else {
-                        self.content.append(" ")
-                    }
-                    
-                    cell.contentLabel.text = self.content[indexPath.row]
-                    tableView.reloadData()
-                }
-            }
-        }
-        
-        cell.usernameLabel.text = chatArray[indexPath.row]
 
-        UIApplication.shared.endIgnoringInteractionEvents()
-        
+
         return cell
         
         

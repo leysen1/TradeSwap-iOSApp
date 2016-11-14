@@ -8,7 +8,6 @@
 */
 
 import UIKit
-
 import Parse
 
 // If you want to use any of the UI components, uncomment this line
@@ -136,7 +135,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             PFAnalytics.trackAppOpened(withRemoteNotificationPayload: userInfo)
         }
     }
-
+  
     ///////////////////////////////////////////////////////////
     // Uncomment this method if you want to use Push Notifications with Background App Refresh
     ///////////////////////////////////////////////////////////

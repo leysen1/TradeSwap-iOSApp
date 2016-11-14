@@ -11,7 +11,7 @@ import Parse
 
 
 
-class TableViewController: UITableViewController, UINavigationControllerDelegate {
+class TableViewController: UITableViewController, UINavigationControllerDelegate, CLLocationManagerDelegate {
     
     // shows users with similar interests in your area
     
@@ -20,6 +20,12 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
     var userSelectedTV = String()
     var currentUserInterests = [String]()
     var username = (PFUser.current()?.username!)!
+    var nearbyUsers = [String]()
+    var radius = Double()
+    
+    var locationManager = CLLocationManager()
+    var userLocation = CLLocationCoordinate2D()
+    
     
     func createAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
@@ -28,89 +34,167 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
         }))
         self.present(alert, animated: true, completion: nil)
     }
-    
 
-    @IBAction func logout(_ sender: AnyObject) {
-        PFUser.logOut()
-        
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let locationCoord = manager.location?.coordinate {
+            
+            self.userLocation = CLLocationCoordinate2D(latitude: locationCoord.latitude, longitude: locationCoord.longitude)
+            print("location manager \(self.userLocation)")
+            
+            PFUser.current()?["location"] = PFGeoPoint(latitude: userLocation.latitude, longitude: userLocation.longitude)
+            PFUser.current()?.saveInBackground(block: { (success, error) in
+                if error != nil {
+                    print(error)
+                } else {
+                    print("saved user location")
+                    print("user location: \(self.userLocation.latitude)")
+                }
+            })
+            locationManager.stopUpdatingLocation()
+            
+        }
     }
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        currentUserInterests.removeAll()
+
+        
         self.title = "Explore"
-        // get students who want a skill you have
-        let query = PFQuery(className: "Skills")
-        query.whereKey("hasSkill", contains: (PFUser.current()?.username!))
-        query.findObjectsInBackground { (objects, error) in
-            if error != nil {
-                print(error)
-            } else {
-                if let objects = objects {
-                    for object in objects {
-                        // add current user skills
-                        if self.currentUserInterests.contains(object["name"] as! String) == false {
-                            self.currentUserInterests.append(object["name"] as! String)
-                        } else {
-                            // do nothing
-                        }
-                        // find students who want a relevant skill
-                        if let studentCol = object["wantsSkill"] as? NSArray {
-                            for student in studentCol {
-                                if self.students.contains(student as! String) == false {
-                                    self.students.append(student as! String)
-                                } else {
-                                    //do nothing
-                                }
+        students.removeAll()
+        // save user Location
+        
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingLocation()
+        
+        // let user location update
+        let delayInSeconds = 1.0
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInSeconds) {
+            
+            
+            // get students who want a skill you have
+            let query = PFQuery(className: "Skills")
+            query.whereKey("hasSkill", contains: (PFUser.current()?.username!))
+            query.findObjectsInBackground { (objects, error) in
+                if error != nil {
+                    print(error)
+                } else {
+                    if let objects = objects {
+                        for object in objects {
+          
+                            // add current user skills
+                            if self.currentUserInterests.contains(object["name"] as! String) == false {
+                                self.currentUserInterests.append(object["name"] as! String)
+                            } else {
+                                // do nothing
                             }
+                            // find students who want a relevant skill
+                            if let studentCol = object["wantsSkill"] as? NSArray {
+                                for student in studentCol {
+                                    if self.students.contains(student as! String) == false {
+                                        self.students.append(student as! String)
+                                    } else {
+                                        //do nothing
+                                    }
+                                }
                         }
                     }
-                     self.tableView.reloadData()
+                    }
+                    print("students \(self.students)")
                 }
-                print("students \(self.students)")
             }
-        }
-        
-        // get student who have a skill you want 
-        
-        let query2 = PFQuery(className: "Skills")
-        query2.whereKey("wantsSkill", contains: (PFUser.current()?.username!))
-        query2.findObjectsInBackground { (objects, error) in
-            if error != nil {
-                print(error)
-            } else {
-                if let objects = objects {
-                    for object in objects {
-                        // add current user skills 
-                        if self.currentUserInterests.contains(object["name"] as! String) == false {
-                            self.currentUserInterests.append(object["name"] as! String)
-                        } else {
-                            // do nothing
-                        }
-                        // find students who have a relevant skill
-                        if let studentCol = object["hasSkill"] as? NSArray {
-                            for student in studentCol {
-                                if self.students.contains(student as! String) == false {
-                                    self.students.append(student as! String)
-                                } else {
-                                    //do nothing
-                                }
+            
+            // get student who have a skill you want
+            let query2 = PFQuery(className: "Skills")
+            query2.whereKey("wantsSkill", contains: (PFUser.current()?.username!))
+            query2.findObjectsInBackground { (objects, error) in
+                if error != nil {
+                    print(error)
+                } else {
+                    if let objects = objects {
+                        for object in objects {
+                      
+                            // add current user skills
+                            if self.currentUserInterests.contains(object["name"] as! String) == false {
+                                self.currentUserInterests.append(object["name"] as! String)
+                            } else {
+                                // do nothing
                             }
+                            // find students who have a relevant skill
+                            if let studentCol = object["hasSkill"] as? NSArray {
+                                for student in studentCol {
+                                    if self.students.contains(student as! String) == false {
+                                        self.students.append(student as! String)
+                                    } else {
+                                        //do nothing
+                                    }
+                                }
+                        }
+                        if self.students.contains(self.username) {
+                            self.students.remove(at: self.students.index(of: self.username)!)
+                            print("students \(self.students)")
+                        }
                         }
                     }
-                    if self.students.contains(self.username) {
-                        self.students.remove(at: self.students.index(of: self.username)!)
-                        print("students \(self.students)")
-                    }
-                    
-                    self.tableView.reloadData()
+                    print("current user interests \(self.currentUserInterests)")
                 }
-                print("current user interests \(self.currentUserInterests)")
+            }
+            
+            print("userLocation \(self.userLocation.latitude)")
+            
+            // get nearby users
+            self.nearbyUsers.removeAll()
+            if let testRadius = PFUser.current()?["searchRadius"] as? Int {
+                self.radius = Double(testRadius)
+            } else {
+                self.radius = Double(10)
+            }
+            
+            let queryLocation = PFQuery(className: "_User")
+            queryLocation.whereKey("location", nearGeoPoint: PFGeoPoint(latitude: self.userLocation.latitude, longitude: self.userLocation.longitude), withinKilometers: self.radius)
+            queryLocation.findObjectsInBackground { (objects, error) in
+                if error != nil {
+                    print(error)
+                } else {
+                    if let objects = objects {
+                        print("objects \(objects)")
+                        for object in objects {
+                
+                            print("object \(object)")
+                            self.nearbyUsers.append(object["username"] as! String)
+                        }
+                        
+                        print("nearby users \(self.nearbyUsers)")
+                        for item in self.students {
+                            if self.nearbyUsers.contains(item) {
+                                // keep item
+                            } else {
+                                self.students.remove(at: self.students.index(of: item)!)
+                            }
+                            self.tableView.reloadData()
+                            print("nearby students \(self.students)")
+                        }
+                    } else {
+                        print("no objects")
+                    }
+                }
+                
+
+            }
+            
+
         }
+
+        
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
         
         
-       
         tableView.tableFooterView = UIView()
         
         // check whether a request is matched up and change parse accordingly
@@ -162,14 +246,6 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
         }
         
     }
-    
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-    // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
@@ -212,7 +288,7 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
                     }
                     interestsString = String(interestsString.characters.dropLast(2))
                     print("interestsstring \(interestsString)")
-                    cell.interestedInLabel.text = "Interest's: \(interestsString)"
+                    cell.interestedInLabel.text = "Interests: \(interestsString)"
                 }
             }
         }
@@ -276,47 +352,25 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
                             cell.imageProfile.layer.masksToBounds = true
                             
                         }
-                        
                     }
                 } else {
                     print("no objects")
                 }
             }
         }
-        
-        /*
-        // get abilities
-        let query2 = PFQuery(className: "Skills")
-        query2.whereKey("hasSkill", contains: students[indexPath.row])
-        query2.findObjectsInBackground { (objects, error) in
-            if error != nil {
-                print(error)
-            } else {
-                var abilities = [String]()
-                if let objects = objects {
-                    for object in objects {
-                        abilities.append(object["name"] as! String)
-                    }
-                    var abilitiesString = String()
-                    for item in abilities {
-                        abilitiesString.append(item)
-                        abilitiesString.append(", ")
-                    }
-              
-                    cell.abilitiesLabel.text = "Abilities: \(abilitiesString)"
-                }
-            }
-        }
-        */
 
         return cell
     }
     
+    
+
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        userSelectedTV = students[indexPath.row]
-        performSegue(withIdentifier: "toPotentialMatchSegue", sender: self)
-        
+        if students.count > 0 {
+            userSelectedTV = students[indexPath.row]
+            performSegue(withIdentifier: "toPotentialMatchSegue", sender: self)
+        }
         
     }
     
@@ -326,6 +380,13 @@ class TableViewController: UITableViewController, UINavigationControllerDelegate
             PotentialVC.userSelectedPM = userSelectedTV
         }
     }
+    
+    
+    @IBAction func logout(_ sender: AnyObject) {
+        PFUser.logOut()
+        
+    }
+    
 
     /*
     // Override to support conditional editing of the table view.

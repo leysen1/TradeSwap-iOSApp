@@ -9,6 +9,7 @@
 import UIKit
 import Parse
 
+
 // sending message still can be a bit buggy
 
 class IndivChatCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
@@ -22,9 +23,7 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
 
-        
         rightButtonItem.addTarget(self, action: #selector(seeProfile), for: UIControlEvents.touchUpInside)
         rightButtonItem.setImage(respondentImage, for: UIControlState.normal)
         let item = UIBarButtonItem(customView: rightButtonItem)
@@ -32,9 +31,11 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
         
         self.title = respondent
         navigationController?.toolbar.isHidden = true
-        
-        
+
         getData()
+        
+        collectionView?.reloadData()
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -89,11 +90,10 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
         
         let members = [respondent, (PFUser.current()?.username!)!]
         
-        content.removeAll()
-        
         let query = PFQuery(className: "Messages")
         query.whereKey("recipient", containedIn: members)
         query.whereKey("sender", containedIn: members)
+        query.order(byAscending: "createdAt")
         query.findObjectsInBackground { (objects, error) in
             if error != nil {
                 print(error)
@@ -102,15 +102,22 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
                 if let objects = objects {
                     for object in objects {
                         print("content \(object["content"])")
-                        self.content.append(object["content"] as! String)
-                        if (object["sender"] as! String) == (PFUser.current()?.username!)! {
-                            self.isSender.append(true)
+                        if self.content.contains(object["content"] as! String) == false {
+                            self.content.append(object["content"] as! String)
+                            if (object["sender"] as! String) == (PFUser.current()?.username!)! {
+                                self.isSender.append(true)
+                            } else {
+                                self.isSender.append(false)
+                            }
                         } else {
-                            self.isSender.append(false)
+                            // do nothing
                         }
-                        self.collectionView?.reloadData()
-                        print("sender \(self.isSender) \(self.content)")
                     }
+                    self.collectionView?.reloadData()
+                    print("sender \(self.isSender) \(self.content)")
+                    
+                    let scrollDown = IndexPath(item: self.content.count - 1, section: 0)
+                    self.collectionView?.scrollToItem(at: scrollDown, at: .bottom, animated: true)
                 }
             }
         }
@@ -195,6 +202,8 @@ class IndivChatCollectionViewController: UICollectionViewController, UICollectio
             viewDidLoad()
             
             inputTextField.text = ""
+            
+            collectionView?.reloadData()
             
         }
 

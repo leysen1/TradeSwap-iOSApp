@@ -16,19 +16,13 @@ class SkillsTableViewController: UITableViewController {
      sort table sections into groups
   
  */
-    
-    struct SkillGroups {
-        var groupName : String!
-        var groupSkills : [String: Bool]!
-    }
-    
+
     var skillsArray = [String]()
     var hasSkill = [String: Bool]()
     var wantsSkill = [String: Bool]()
     var showMySkills: Bool = true
     let searchController = UISearchController(searchResultsController: nil)
     var filteredSkillsArray = [String]()
-    
     
     func filterContentForSearchText(searchText: String, scope: String = "All") {
         filteredSkillsArray = skillsArray.filter({ (skill) -> Bool in
@@ -41,7 +35,7 @@ class SkillsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         skills()
         
         tableView.tableFooterView = UIView()
@@ -54,7 +48,6 @@ class SkillsTableViewController: UITableViewController {
 
     
     func skills() {
-        
         
         // create array of all skills
         let query = PFQuery(className: "Skills")
@@ -109,7 +102,8 @@ class SkillsTableViewController: UITableViewController {
                             })
                         }
                     }
-                }
+                    
+                    }
                 else {
                     print("no skills found")
                 }

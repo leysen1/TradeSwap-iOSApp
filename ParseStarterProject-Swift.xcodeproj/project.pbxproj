@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		511328661DC3F97B00A04B31 /* NeighbourhoodsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511328651DC3F97B00A04B31 /* NeighbourhoodsTableViewController.swift */; };
 		511E30AC1DC7AB34003CF68C /* MainTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511E30AB1DC7AB34003CF68C /* MainTableViewCell.swift */; };
 		511E30AE1DC7B707003CF68C /* PotentialMatchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511E30AD1DC7B707003CF68C /* PotentialMatchViewController.swift */; };
 		51575BD21DCBA15100061278 /* ChatTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51575BD11DCBA15100061278 /* ChatTableViewController.swift */; };
@@ -35,7 +34,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		511328651DC3F97B00A04B31 /* NeighbourhoodsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NeighbourhoodsTableViewController.swift; sourceTree = "<group>"; };
 		511E30AB1DC7AB34003CF68C /* MainTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTableViewCell.swift; sourceTree = "<group>"; };
 		511E30AD1DC7B707003CF68C /* PotentialMatchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PotentialMatchViewController.swift; sourceTree = "<group>"; };
 		51575BD11DCBA15100061278 /* ChatTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatTableViewController.swift; sourceTree = "<group>"; };
@@ -121,7 +119,6 @@
 				51FF72251DBABF7400C60584 /* TableViewController.swift */,
 				511E30AB1DC7AB34003CF68C /* MainTableViewCell.swift */,
 				511E30AD1DC7B707003CF68C /* PotentialMatchViewController.swift */,
-				511328651DC3F97B00A04B31 /* NeighbourhoodsTableViewController.swift */,
 				51783A6E1DBFDDFF005AA227 /* SkillDescriptionViewController.swift */,
 				51783A741DBFE0D1005AA227 /* SkillDescriptionTableViewCell.swift */,
 				5189C2EB1DD4EC0600E143CC /* SkillCellViewController.swift */,
@@ -234,7 +231,6 @@
 			files = (
 				81BA814D1A49DA1800E65899 /* ViewController.swift in Sources */,
 				511E30AC1DC7AB34003CF68C /* MainTableViewCell.swift in Sources */,
-				511328661DC3F97B00A04B31 /* NeighbourhoodsTableViewController.swift in Sources */,
 				51575BD81DCBCE2200061278 /* IndivChatCollectionViewController.swift in Sources */,
 				511E30AE1DC7B707003CF68C /* PotentialMatchViewController.swift in Sources */,
 				51FF72261DBABF7400C60584 /* TableViewController.swift in Sources */,

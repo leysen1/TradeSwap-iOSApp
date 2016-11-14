@@ -116,6 +116,10 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
         skillsTable.tableFooterView = UIView()
         wantsTable.tableFooterView = UIView()
 
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
         // match button
         if let requestedArray = PFUser.current()?["MatchRequest"] as? NSArray {
             if (requestedArray.contains(self.userSelectedPM)) {
@@ -125,23 +129,23 @@ class PotentialMatchViewController: UIViewController, UITableViewDelegate, UITab
                 self.matchButtonLabel.setTitle("Match Requested", for: .normal)
                 self.matchButtonLabel.setTitleColor(UIColor.darkGray, for: .normal)
             }
-        else {
-            if let acceptedArray = PFUser.current()?["MatchAccepted"] as? NSArray {
-                print("acceptedArray \(acceptedArray)")
-            if (acceptedArray.contains(self.userSelectedPM)) {
-                // match already accepted
-                print("Match already accepted")
-                self.matchButtonLabel.isEnabled = false
-                self.matchButtonLabel.setTitle("Matched", for: .normal)
-                self.matchButtonLabel.setTitleColor(UIColor.darkGray, for: .normal)
-                
-            } else {
-                // match not requested nor accepted
-                print("Please request match")
-                self.matchButtonLabel.isEnabled = true
-                self.matchButtonLabel.setTitle("Request Match", for: .normal)
-            }
-        }
+            else {
+                if let acceptedArray = PFUser.current()?["MatchAccepted"] as? NSArray {
+                    print("acceptedArray \(acceptedArray)")
+                    if (acceptedArray.contains(self.userSelectedPM)) {
+                        // match already accepted
+                        print("Match already accepted")
+                        self.matchButtonLabel.isEnabled = false
+                        self.matchButtonLabel.setTitle("Matched", for: .normal)
+                        self.matchButtonLabel.setTitleColor(UIColor.darkGray, for: .normal)
+                        
+                    } else {
+                        // match not requested nor accepted
+                        print("Please request match")
+                        self.matchButtonLabel.isEnabled = true
+                        self.matchButtonLabel.setTitle("Request Match", for: .normal)
+                    }
+                }
             }
         }
     }
